@@ -18,7 +18,7 @@ parameters:
         description: >
             Include the NFS mount point provided by Manila service
         constraints:
-            - allowed_pattern: '10.2.0.2:/volumes/_nogroup/.*'
+            - allowed_pattern: '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:/.*'
     user_network:
         type: string
         label: user_network
@@ -28,6 +28,7 @@ parameters:
     workers_number:
         type: number
         label: number_of_workers
+        default: 1
         description: Set the number of worker nodes
         constraints:
             - range: { min: 1, max: 5 }
@@ -50,7 +51,7 @@ resources:
                   template: |
                       #!/bin/bash
                       # Here we can add our own script
-                      echo "Running boot script with NFS mount point: $MOUNT_POINT" > /tmp/context.out
+                      echo "Running Master script with NFS mount point: $MOUNT_POINT" > /tmp/context.out
                   params:
                       $MOUNT_POINT: {get_param: mount_point}
           metadata:
@@ -86,7 +87,7 @@ resources:
                       template: |
                           #!/bin/bash
                           # Here we can add our own script
-                          echo "Running boot script with NFS mount point: $MOUNT_POINT" > /tmp/context.out
+                          echo "Running Worker script with NFS mount point: $MOUNT_POINT" > /tmp/context.out
                       params:
                           $MOUNT_POINT: {get_param: mount_point}
               metadata:
