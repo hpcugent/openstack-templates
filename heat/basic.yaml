@@ -1,0 +1,54 @@
+heat_template_version: 2018-03-02
+
+description: > 
+    This template instantiates an Ubuntu 16.04 VM with
+    a quite basic contextualisation script.
+
+parameters:
+    user_key:
+        type: string
+        label: ssh_user_key
+        description: Public user ssh key to be injected in the cluster VMs
+        constraints:
+            - custom_constraint: nova.keypair
+    mount_point:
+        type: string
+        label: nfs_mount_point
+        description: >
+            Include the NFS mount point provided by Manila service
+        constraints:
+            - allowed_pattern: '10.2.0.2:/volumes/_nogroup/.*'
+    user_network:
+        type: string
+        label: user_network
+        description: Add the required VM network
+        constraints:
+            - custom_constraint: neutron.network
+
+resources:
+    my_server:
+        type: OS::Nova::Server
+        properties:
+          name: MyServer
+          user_data:
+              str_replace:
+                  template: |
+                      #!/bin/bash
+                      # Here we can add our own script
+                      echo "Running boot script with NFS mount point: $MOUNT_POINT" > /tmp/context.out
+                  params:
+                      $MOUNT_POINT: {get_param: mount_point}
+          metadata:
+              # Some metadata examples to be included in the VM
+              server: master
+              color: red
+              mount_point: { get_param: mount_point }
+          security_groups: 
+              - default
+          networks: 
+              - network: { get_param: user_network }
+                tag: master_ip
+          key_name: { get_param: user_key }
+          image: Ubuntu_16.04_2NICs
+          flavor: m1.tiny
+

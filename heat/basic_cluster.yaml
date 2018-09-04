@@ -1,0 +1,103 @@
+heat_template_version: 2018-03-02
+
+description: > 
+    This template instantiates a virtual cluster,
+    The user can provide the number of worker nodes,
+    or set the master IP.
+
+parameters:
+    user_key:
+        type: string
+        label: ssh_user_key
+        description: Public user ssh key to be injected in the cluster VMs
+        constraints:
+            - custom_constraint: nova.keypair
+    mount_point:
+        type: string
+        label: nfs_mount_point
+        description: >
+            Include the NFS mount point provided by Manila service
+        constraints:
+            - allowed_pattern: '10.2.0.2:/volumes/_nogroup/.*'
+    user_network:
+        type: string
+        label: user_network
+        description: Add the required VM network
+        constraints:
+            - custom_constraint: neutron.network
+    workers_number:
+        type: number
+        label: number_of_workers
+        description: Set the number of worker nodes
+        constraints:
+            - range: { min: 1, max: 5 }
+              description: Cluster size
+            - modulo: { step: 1, offset: 0 }
+    master_ip:
+        type: string
+        label: master_ip
+        description: >
+            Choose the master fixed IP within the VM pool network
+
+resources:
+
+    my_server:
+        type: OS::Nova::Server
+        properties:
+          name: MyServer
+          user_data:
+              str_replace:
+                  template: |
+                      #!/bin/bash
+                      # Here we can add our own script
+                      echo "Running boot script with NFS mount point: $MOUNT_POINT" > /tmp/context.out
+                  params:
+                      $MOUNT_POINT: {get_param: mount_point}
+          metadata:
+              # Some metadata examples to be included in the VM
+              server: master
+              color: red
+              mount_point: { get_param: mount_point }
+          security_groups: 
+              - default
+          networks:
+              - network: { get_param: user_network }
+                tag: master_ip
+                # Master must have a fixed IP or Port
+                fixed_ip: { get_param: master_ip }
+          key_name: { get_param: user_key }
+          image: Ubuntu_16.04_2NICs
+          flavor: m1.tiny
+
+    my_workers_group:
+        type: OS::Heat::ResourceGroup
+        # Start the cluster server first
+        depends_on: [my_server]
+        properties:
+          count: { get_param: workers_number }
+          resource_def:
+            type: OS::Nova::Server
+            properties:
+              # create a unique name for each server
+              # using its index in the group
+              name: worker_%index%
+              user_data:
+                  str_replace:
+                      template: |
+                          #!/bin/bash
+                          # Here we can add our own script
+                          echo "Running boot script with NFS mount point: $MOUNT_POINT" > /tmp/context.out
+                      params:
+                          $MOUNT_POINT: {get_param: mount_point}
+              metadata:
+                  # Some metadata examples to be included in the VM
+                  server: master
+                  color: red
+                  mount_point: { get_param: mount_point }
+              security_groups: 
+                  - default
+              networks:
+                  - network: { get_param: user_network }
+              key_name: { get_param: user_key }
+              image: Ubuntu_16.04_2NICs
+              flavor: m1.tiny

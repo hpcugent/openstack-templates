@@ -1,0 +1,55 @@
+heat_template_version: 2018-03-02
+
+description: > 
+    This template creates a persistent bootable volumen
+    from a existing image (selected by the user).
+    After that Heat starts a VM using the new persistent volume.
+
+parameters:
+    user_key:
+        type: string
+        label: ssh_user_key
+        description: Public user ssh key to be injected in the VM
+        constraints:
+            - custom_constraint: nova.keypair
+    os_image:
+        type: string
+        label: os_image
+        description: Choose an OpenStack image from the list
+        constraints:
+            - custom_constraint: glance.image
+    user_network:
+        type: string
+        label: user_network
+        description: Add the required VM network
+        constraints:
+            - custom_constraint: neutron.network
+
+resources:
+    my_bootable_volume:
+        type: OS::Cinder::Volume
+        # Here we create a persisten volume from a existing image
+        properties:
+            size: 10
+            image: { get_param: os_image }
+    my_server:
+        type: OS::Nova::Server
+        properties:
+          name: MyServer
+          block_device_mapping:
+              - device_name: vda
+                volume_id: { get_resource: my_bootable_volume }
+                delete_on_termination: false
+          metadata:
+              # Some metadata examples to be included in the VM
+              server: master
+              color: red
+              boot_volume_id: { get_resource: my_bootable_volume }
+          security_groups: 
+              - default
+          networks: 
+              - network: { get_param: user_network }
+                tag: master_ip
+          key_name: { get_param: user_key }
+          flavor: m1.tiny
+
