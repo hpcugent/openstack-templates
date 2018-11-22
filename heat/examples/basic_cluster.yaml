@@ -1,9 +1,12 @@
 heat_template_version: 2018-03-02
 
 description: > 
-    This template instantiates a virtual cluster,
+    This stack template instantiates a virtual cluster,
     The user can provide the number of worker nodes,
-    or set the master IP.
+    or set the master IP. This stack also creates a new port
+    with the master IP and assigns this port to the VM.
+    After that the stack assigns a floating IP to the
+    new port.
 
 parameters:
     user_key:
@@ -39,11 +42,37 @@ parameters:
         label: master_ip
         description: >
             Choose the master fixed IP within the VM pool network
+        constraints:
+            - allowed_pattern: '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
 
 resources:
 
+    my_server_port:
+        type: OS::Neutron::Port
+        properties:
+          admin_state_up: true
+          name: my_server_port
+          network: { get_param: user_network }
+          port_security_enabled: true
+          fixed_ips:
+              - ip_address: { get_param: master_ip }
+          security_groups:
+              - default
+
+    floating_ip:
+        type: OS::Neutron::FloatingIP
+        depends_on:
+          - my_server_port
+        properties:
+          port_id: { get_resource: my_server_port }
+          # We want a public IP
+          floating_network: public
+
     my_server:
         type: OS::Nova::Server
+        depends_on:
+          - my_server_port
+          - floating_ip
         properties:
           name: MyServer
           user_data:
@@ -59,13 +88,10 @@ resources:
               server: master
               color: red
               mount_point: { get_param: mount_point }
-          security_groups: 
-              - default
           networks:
-              - network: { get_param: user_network }
+              # Master must have a fixed IP or Port
+              - port: { get_resource: my_server_port }
                 tag: master_ip
-                # Master must have a fixed IP or Port
-                fixed_ip: { get_param: master_ip }
           key_name: { get_param: user_key }
           image: Ubuntu_16.04_2NICs
           flavor: m1.tiny
