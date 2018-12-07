@@ -1,0 +1,72 @@
+heat_template_version: 2018-03-02
+
+description: > 
+    This template illustrates the creation of a VM
+    together with a NFS share
+
+parameters:
+    user_key:
+        type: string
+        label: ssh_user_key
+        description: Public user ssh key to be injected in the cluster VMs
+        constraints:
+            - custom_constraint: nova.keypair
+    user_net1:
+        type: string
+        label: user_net1
+        description: Add the required VM network
+        constraints:
+            - custom_constraint: neutron.network
+    user_net2:
+        type: string
+        label: user_net2
+        description: Add the required VM network
+        constraints:
+            - custom_constraint: neutron.network
+    user_share_name:
+        type: string
+        label: share_name
+        description: Give a name to the share
+        constraints:
+            - length: { min: 1, max: 32 }
+              description: Share name must contain between 1 and 32 characters
+            - allowed_pattern: "[a-zA-Z0-9_]+"
+              description: Only alpha-numeric and "_" characters allowed
+    user_share_size:
+        type: number
+        label: share_size
+        description: Specify the share size (in GB)
+        constraints:
+            - range: { min: 1, max: 100 }
+
+resources:
+    my_server:
+        type: OS::Nova::Server
+        properties:
+          name: My_VM_with_NFS_share
+          metadata:
+              # Some metadata examples to be included in the VM
+              server: master
+              color: red
+          security_groups: 
+              - default
+          networks: 
+              - network: { get_param: user_net1 }
+                tag: master_ip
+              - network: { get_param: user_net2 }
+                tag: master_ip
+          key_name: { get_param: user_key }
+          image: Ubuntu_16.04_2NICs
+          flavor: m1.medium
+    my_share:
+        type: OS::Manila::Share
+        properties:
+          access_rules: [{"access_level": rw, "access_type": ip, "access_to": 0.0.0.0}]
+          description: Creation of a Manila NFS share
+          is_public: false
+          name: { get_param: user_share_name }
+          share_protocol: NFS
+          share_type: cephfsnfstype
+          size: { get_param: user_share_size }
+
+
