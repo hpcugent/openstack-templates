@@ -1,6 +1,6 @@
 heat_template_version: 2018-03-02
 
-description: > 
+description: >
     This stack template instantiates a virtual cluster,
     The user can provide the number of worker nodes,
     or set the master IP. This stack also creates a new port
@@ -15,6 +15,18 @@ parameters:
         description: Public user ssh key to be injected in the cluster VMs
         constraints:
             - custom_constraint: nova.keypair
+    vm_flavour:
+        type: string
+        label: vm_flavour
+        description: Flavour for the VM
+        constraints:
+            - custom_constraint: nova.flavor
+    vm_image:
+        type: string
+        label: vm_image
+        description: Required VM image
+        constraints:
+            - custom_constraint: glance.image
     mount_point:
         type: string
         label: nfs_mount_point
@@ -93,8 +105,8 @@ resources:
               - port: { get_resource: my_server_port }
                 tag: master_ip
           key_name: { get_param: user_key }
-          image: Ubuntu_16.04_2NICs
-          flavor: m1.tiny
+          image: { get_param: vm_image }
+          flavor: { get_param: vm_flavour }
 
     my_workers_group:
         type: OS::Heat::ResourceGroup
@@ -126,5 +138,5 @@ resources:
               networks:
                   - network: { get_param: user_network }
               key_name: { get_param: user_key }
-              image: Ubuntu_16.04_2NICs
-              flavor: m1.tiny
+              image: { get_param: vm_image }
+              flavor: { get_param: vm_flavour }
