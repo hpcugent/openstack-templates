@@ -38,16 +38,32 @@ parameters:
         description: Specify the share size (in GB)
         constraints:
             - range: { min: 1, max: 100 }
+    user_vm_flavor:
+        type: string
+        label: vm_flavor
+        description: Choose a flavor
+        constraints:
+            - custom_constraint: nova.flavor
+        default: m1.small
+    user_vm_image:
+        type: string
+        label: vm_image
+        description: Choose an image
+        constraints:
+            - custom_constraint: glance.image
 
 resources:
     my_server:
         type: OS::Nova::Server
+        depends_on:
+            - my_share
         properties:
           name: My_VM_with_NFS_share
           metadata:
               # Some metadata examples to be included in the VM
               server: master
               color: red
+              share_export_loc_path: { get_attr: [my_share, export_locations, 0, path] } 
           security_groups: 
               - default
           networks: 
@@ -56,8 +72,8 @@ resources:
               - network: { get_param: user_net2 }
                 tag: master_ip
           key_name: { get_param: user_key }
-          image: Ubuntu_16.04_2NICs
-          flavor: m1.medium
+          image: { get_param: user_vm_image }
+          flavor: { get_param: user_vm_flavor }
     my_share:
         type: OS::Manila::Share
         properties:
@@ -68,5 +84,6 @@ resources:
           share_protocol: NFS
           share_type: cephfsnfstype
           size: { get_param: user_share_size }
+
 
 
