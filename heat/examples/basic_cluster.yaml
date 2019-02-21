@@ -5,8 +5,23 @@ description: >
     The user can provide the number of worker nodes,
     or set the master IP. This stack also creates a new port
     with the master IP and assigns this port to the VM.
+
     After that the user can assign port forwarding rules to
     the instantiated VMs.
+    A portforwarding.ini example:
+
+    [DEFAULT]
+    floatingip=<project's floating IP>
+    network=_vm
+
+    [server]
+    pattern=MyServer_(\d+)
+    22=22
+
+    [workers]
+    pattern=Worker_(\d+)
+    22=50000
+
 
 parameters:
     user_key:
@@ -109,7 +124,7 @@ resources:
             properties:
               # create a unique name for each server
               # using its index in the group
-              name: worker_0%index%
+              name: Worker_0%index%
               user_data:
                   str_replace:
                       template: |
