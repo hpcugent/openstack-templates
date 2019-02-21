@@ -1,12 +1,12 @@
-heat_template_version: 2018-03-02
+heat_template_version: 2018-08-31
 
 description: >
     This stack template instantiates a virtual cluster,
     The user can provide the number of worker nodes,
     or set the master IP. This stack also creates a new port
     with the master IP and assigns this port to the VM.
-    After that the stack assigns a floating IP to the
-    new port.
+    After that the user can assign port forwarding rules to
+    the instantiated VMs.
 
 parameters:
     user_key:
@@ -71,22 +71,12 @@ resources:
           security_groups:
               - default
 
-    floating_ip:
-        type: OS::Neutron::FloatingIP
-        depends_on:
-          - my_server_port
-        properties:
-          port_id: { get_resource: my_server_port }
-          # We want a public IP
-          floating_network: public
-
     my_server:
         type: OS::Nova::Server
         depends_on:
           - my_server_port
-          - floating_ip
         properties:
-          name: MyServer
+          name: MyServer_00
           user_data:
               str_replace:
                   template: |
@@ -119,7 +109,7 @@ resources:
             properties:
               # create a unique name for each server
               # using its index in the group
-              name: worker_%index%
+              name: worker_0%index%
               user_data:
                   str_replace:
                       template: |
