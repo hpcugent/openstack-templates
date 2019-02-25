@@ -58,32 +58,40 @@ resources:
         depends_on:
             - my_share
         properties:
-          name: My_VM_with_NFS_share
-          metadata:
-              # Some metadata examples to be included in the VM
-              server: master
-              color: red
-              share_export_loc_path: { get_attr: [my_share, export_locations, 0, path] } 
-          security_groups: 
-              - default
-          networks: 
-              - network: { get_param: user_net1 }
-                tag: master_ip
-              - network: { get_param: user_net2 }
-                tag: master_ip
-          key_name: { get_param: user_key }
-          image: { get_param: user_vm_image }
-          flavor: { get_param: user_vm_flavor }
+            name: My_VM_with_NFS_share
+            metadata:
+                # Some metadata examples to be included in the VM
+                server: master
+                color: red
+                share_export_loc_path: { get_attr: [my_share, export_locations, 0, path] } 
+            security_groups: 
+                - default
+            networks: 
+                - network: { get_param: user_net1 }
+                  tag: master_ip
+                - network: { get_param: user_net2 }
+                  tag: master_ip
+            key_name: { get_param: user_key }
+            image: { get_param: user_vm_image }
+            flavor: { get_param: user_vm_flavor }
+            user_data: |
+                #!/usr/bin/env bash
+                apt-get -y install jq
+                EXPORTLOC=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json | jq '.meta.share_export_loc_path' | awk -F "'" '{print $2}')
+                MOUNTPOINT='/mnt/share'
+                mkdir $MOUNTPOINT
+                chown root:root $MOUNTPOINT
+                mount $EXPORTLOC $MOUNTPOINT
     my_share:
         type: OS::Manila::Share
         properties:
-          access_rules: [{"access_level": rw, "access_type": ip, "access_to": 0.0.0.0}]
-          description: Creation of a Manila NFS share
-          is_public: false
-          name: { get_param: user_share_name }
-          share_protocol: NFS
-          share_type: cephfsnfstype
-          size: { get_param: user_share_size }
+            access_rules: [{"access_level": rw, "access_type": ip, "access_to": 0.0.0.0}]
+            description: Creation of a Manila NFS share
+            is_public: false
+            name: { get_param: user_share_name }
+            share_protocol: NFS
+            share_type: cephfsnfstype
+            size: { get_param: user_share_size }
 
 
 
