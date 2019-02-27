@@ -75,13 +75,16 @@ resources:
             image: { get_param: user_vm_image }
             flavor: { get_param: user_vm_flavor }
             user_data: |
-                #!/usr/bin/env bash
-                apt-get -y install jq
-                EXPORTLOC=$(curl -s http://169.254.169.254/openstack/latest/meta_data.json | jq '.meta.share_export_loc_path' | awk -F "'" '{print $2}')
-                MOUNTPOINT='/mnt/share'
-                mkdir $MOUNTPOINT
-                chown root:root $MOUNTPOINT
-                mount $EXPORTLOC $MOUNTPOINT
+                #!/usr/bin/env python
+                import json,re,requests
+                r = requests.get('http://169.254.169.254/openstack/latest/meta_data.json')
+                data = r.json()
+                m = re.search('\'(.+?)\'', data['meta']['share_export_loc_path'])
+                sharepath = m.group(1)
+                mountpoint = '/mnt/share'
+                os.mkdir(mountpoint)
+                os.chown(mountpoint,0,0)
+                os.system("mount %s %s" % (sharepath,mountpoint))
     my_share:
         type: OS::Manila::Share
         properties:
