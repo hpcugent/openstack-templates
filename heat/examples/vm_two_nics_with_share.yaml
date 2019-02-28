@@ -76,7 +76,7 @@ resources:
             flavor: { get_param: user_vm_flavor }
             user_data: |
                 #!/usr/bin/env python
-                import json,re,requests
+                import os,json,re,requests
                 r = requests.get('http://169.254.169.254/openstack/latest/meta_data.json')
                 data = r.json()
                 m = re.search('\'(.+?)\'', data['meta']['share_export_loc_path'])
