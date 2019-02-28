@@ -1,0 +1,100 @@
+heat_template_version: 2018-03-02
+
+description: > 
+    This template illustrates the creation of a VM
+    together with a NFS share
+
+parameters:
+    user_key:
+        type: string
+        label: ssh_user_key
+        description: Public user ssh key to be injected in the cluster VMs
+        constraints:
+            - custom_constraint: nova.keypair
+    user_net1:
+        type: string
+        label: user_net1
+        description: Add the required VM network
+        constraints:
+            - custom_constraint: neutron.network
+    user_net2:
+        type: string
+        label: user_net2
+        description: Add the required VM network
+        constraints:
+            - custom_constraint: neutron.network
+    user_share_name:
+        type: string
+        label: share_name
+        description: Give a name to the share
+        constraints:
+            - length: { min: 1, max: 32 }
+              description: Share name must contain between 1 and 32 characters
+            - allowed_pattern: "[a-zA-Z0-9_]+"
+              description: Only alpha-numeric and "_" characters allowed
+    user_share_size:
+        type: number
+        label: share_size
+        description: Specify the share size (in GB)
+        constraints:
+            - range: { min: 1, max: 100 }
+    user_vm_flavor:
+        type: string
+        label: vm_flavor
+        description: Choose a flavor
+        constraints:
+            - custom_constraint: nova.flavor
+        default: m1.small
+    user_vm_image:
+        type: string
+        label: vm_image
+        description: Choose an image
+        constraints:
+            - custom_constraint: glance.image
+
+resources:
+    my_server:
+        type: OS::Nova::Server
+        depends_on:
+            - my_share
+        properties:
+            name: My_VM_with_NFS_share
+            metadata:
+                # Some metadata examples to be included in the VM
+                server: master
+                color: red
+                share_export_loc_path: { get_attr: [my_share, export_locations, 0, path] } 
+            security_groups: 
+                - default
+            networks: 
+                - network: { get_param: user_net1 }
+                  tag: master_ip
+                - network: { get_param: user_net2 }
+                  tag: master_ip
+            key_name: { get_param: user_key }
+            image: { get_param: user_vm_image }
+            flavor: { get_param: user_vm_flavor }
+            user_data: |
+                #!/usr/bin/env python
+                import json,re,requests
+                r = requests.get('http://169.254.169.254/openstack/latest/meta_data.json')
+                data = r.json()
+                m = re.search('\'(.+?)\'', data['meta']['share_export_loc_path'])
+                sharepath = m.group(1)
+                mountpoint = '/mnt/share'
+                os.mkdir(mountpoint)
+                os.chown(mountpoint,0,0)
+                os.system("mount %s %s" % (sharepath,mountpoint))
+    my_share:
+        type: OS::Manila::Share
+        properties:
+            access_rules: [{"access_level": rw, "access_type": ip, "access_to": 0.0.0.0}]
+            description: Creation of a Manila NFS share
+            is_public: false
+            name: { get_param: user_share_name }
+            share_protocol: NFS
+            share_type: cephfsnfstype
+            size: { get_param: user_share_size }
+
+
+
