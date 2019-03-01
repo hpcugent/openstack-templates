@@ -58,12 +58,12 @@ resources:
         depends_on:
             - my_share
         properties:
-            name: My_VM_with_NFS_share
+            name: MyVMwithNFSshare
             metadata:
                 # Some metadata examples to be included in the VM
                 server: master
                 color: red
-                share_export_loc_path: { get_attr: [my_share, export_locations, 0, path] } 
+                share_export_loc_path: { get_attr: [my_share, export_locations] } 
             security_groups: 
                 - default
             networks: 
@@ -74,17 +74,7 @@ resources:
             key_name: { get_param: user_key }
             image: { get_param: user_vm_image }
             flavor: { get_param: user_vm_flavor }
-            user_data: |
-                #!/usr/bin/env python
-                import os,json,re,requests
-                r = requests.get('http://169.254.169.254/openstack/latest/meta_data.json')
-                data = r.json()
-                m = re.search('\'(.+?)\'', data['meta']['share_export_loc_path'])
-                sharepath = m.group(1)
-                mountpoint = '/mnt/share'
-                os.mkdir(mountpoint)
-                os.chown(mountpoint,0,0)
-                os.system("mount %s %s" % (sharepath,mountpoint))
+            user_data: { get_file: 'https://raw.githubusercontent.com/StephaneGerardVUB/openstack-templates/HeatTemplateWithShare/heat/examples/mount_share.py' }
     my_share:
         type: OS::Manila::Share
         properties:
