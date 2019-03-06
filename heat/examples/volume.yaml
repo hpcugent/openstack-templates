@@ -12,6 +12,12 @@ parameters:
         description: Public user ssh key to be injected in the VM
         constraints:
             - custom_constraint: nova.keypair
+    vm_flavour:
+        type: string
+        label: vm_flavour
+        description: Flavour for the VM
+        constraints:
+            - custom_constraint: nova.flavor
     os_image:
         type: string
         label: os_image
@@ -24,16 +30,27 @@ parameters:
         description: Add the required VM network
         constraints:
             - custom_constraint: neutron.network
+    user_volume_size:
+        type: number
+        label: user_volume_size
+        default: 10
+        description: Volume size in GB
+        constraints:
+            - range: { min: 10, max: 50 }
+              description: Volume size GB
+            - modulo: { step: 1, offset: 0 }
 
 resources:
     my_bootable_volume:
         type: OS::Cinder::Volume
         # Here we create a persisten volume from a existing image
         properties:
-            size: 10
+            size: { get_param: user_volume_size }
             image: { get_param: os_image }
     my_server:
         type: OS::Nova::Server
+        depends_on:
+          - my_bootable_volume
         properties:
           name: MyServer
           block_device_mapping:
@@ -51,5 +68,5 @@ resources:
               - network: { get_param: user_network }
                 tag: master_ip
           key_name: { get_param: user_key }
-          flavor: m1.tiny
+          flavor: { get_param: vm_flavour }
 

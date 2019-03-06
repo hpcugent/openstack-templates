@@ -1,9 +1,27 @@
-heat_template_version: 2018-03-02
+heat_template_version: 2018-08-31
 
-description: > 
-    This template instantiates a virtual cluster,
+description: >
+    This stack template instantiates a virtual cluster,
     The user can provide the number of worker nodes,
-    or set the master IP.
+    or set the master IP. This stack also creates a new port
+    with the master IP and assigns this port to the VM.
+
+    After that the user can assign port forwarding rules to
+    the instantiated VMs.
+    A portforwarding.ini example:
+
+    [DEFAULT]
+    floatingip=<project's floating IP>
+    network=_vm
+
+    [server]
+    pattern=MyServer_(\d+)
+    22=22
+
+    [workers]
+    pattern=Worker_(\d+)
+    22=50000
+
 
 parameters:
     user_key:
@@ -12,6 +30,18 @@ parameters:
         description: Public user ssh key to be injected in the cluster VMs
         constraints:
             - custom_constraint: nova.keypair
+    vm_flavour:
+        type: string
+        label: vm_flavour
+        description: Flavour for the VM
+        constraints:
+            - custom_constraint: nova.flavor
+    vm_image:
+        type: string
+        label: vm_image
+        description: Required VM image
+        constraints:
+            - custom_constraint: glance.image
     mount_point:
         type: string
         label: nfs_mount_point
@@ -39,13 +69,29 @@ parameters:
         label: master_ip
         description: >
             Choose the master fixed IP within the VM pool network
+        constraints:
+            - allowed_pattern: '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
 
 resources:
 
+    my_server_port:
+        type: OS::Neutron::Port
+        properties:
+          admin_state_up: true
+          name: my_server_port
+          network: { get_param: user_network }
+          port_security_enabled: true
+          fixed_ips:
+              - ip_address: { get_param: master_ip }
+          security_groups:
+              - default
+
     my_server:
         type: OS::Nova::Server
+        depends_on:
+          - my_server_port
         properties:
-          name: MyServer
+          name: MyServer_00
           user_data:
               str_replace:
                   template: |
@@ -59,16 +105,13 @@ resources:
               server: master
               color: red
               mount_point: { get_param: mount_point }
-          security_groups: 
-              - default
           networks:
-              - network: { get_param: user_network }
+              # Master must have a fixed IP or Port
+              - port: { get_resource: my_server_port }
                 tag: master_ip
-                # Master must have a fixed IP or Port
-                fixed_ip: { get_param: master_ip }
           key_name: { get_param: user_key }
-          image: Ubuntu_16.04_2NICs
-          flavor: m1.tiny
+          image: { get_param: vm_image }
+          flavor: { get_param: vm_flavour }
 
     my_workers_group:
         type: OS::Heat::ResourceGroup
@@ -81,7 +124,7 @@ resources:
             properties:
               # create a unique name for each server
               # using its index in the group
-              name: worker_%index%
+              name: Worker_0%index%
               user_data:
                   str_replace:
                       template: |
@@ -100,5 +143,5 @@ resources:
               networks:
                   - network: { get_param: user_network }
               key_name: { get_param: user_key }
-              image: Ubuntu_16.04_2NICs
-              flavor: m1.tiny
+              image: { get_param: vm_image }
+              flavor: { get_param: vm_flavour }
