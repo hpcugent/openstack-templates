@@ -74,7 +74,7 @@ resources:
             key_name: { get_param: user_key }
             image: { get_param: user_vm_image }
             flavor: { get_param: user_vm_flavor }
-            user_data: { get_file: 'https://raw.githubusercontent.com/StephaneGerardVUB/openstack-templates/HeatTemplateWithShare/heat/examples/mount_share.py' }
+            user_data: { get_file: 'https://raw.githubusercontent.com/hpcugent/openstack-templates/HeatTemplateWithShare/heat/examples/mount_share.py' }
     my_share:
         type: OS::Manila::Share
         properties:
