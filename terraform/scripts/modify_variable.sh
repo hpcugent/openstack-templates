@@ -45,7 +45,7 @@ do
 	ip_id="$(echo \"$line\"|awk '{print $1}')"
 	python3 -c "import ipaddress; ip = ipaddress.ip_address('$(echo \"$ip\")') in ipaddress.ip_network('$(echo \"$vm_floating_ip_cidr\")'); print (ip);"|grep "True" &>/dev/null && export floating_ip_id="$ip_id" && break
 done < <(openstack floating ip list -f value -c "Floating IP Address" -c ID -c "Port"|grep None)
-#[ -z "$floating_ip_id" ] && echo "Unable to find floating ip address. Exiting.." 1>&2 && exit 1
+[ -z "$floating_ip_id" ] && echo "Unable to find floating ip address. Exiting.." 1>&2 && exit 1
 echo "Using floating ip id: $floating_ip_id."
 while read line
 do
