@@ -35,7 +35,7 @@ module "vm_with_pf_rules_with_ssh_access_with_vsc_net" {
   vm_network_id        = "_VM_NETWORK_ID_"
   vm_subnet_id         = "_VM_SUBNET_ID_"
   vsc_network_id       = "_VSC_NETWORK_ID_"
-  vsc_subnet_id        = "_VSC_SUBNET_ID_
+  vsc_subnet_id        = "_VSC_SUBNET_ID_"
   access_key           = "_ACCESS_KEY_"
   image_name           = "CentOS-8-stream"
   flavor_name          = "CPUv1.small"
