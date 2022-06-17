@@ -1,6 +1,4 @@
-environment/clouds.yaml
 environment/terraform.tfstate.backup
 environment/terraform.tfstate
 environment/.terraform/*
 environment/.terraform.lock.hcl
-environment/app-cred-*-openrc.sh

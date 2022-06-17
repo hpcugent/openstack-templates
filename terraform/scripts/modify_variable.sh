@@ -3,14 +3,6 @@
 vm_floating_ip_cidr="193.190.80.0/25"
 vsc_floating_ip_cidr="172.24.48.0/20"
 
-source ../environment/app-cred-*-openrc.sh 
-retcode=$?
-if [ $retcode -ne 0 ]
-then
-	echo "Unable to source ../environment/app-cred-*-openrc.sh file." 1>&2
-	exit 1
-fi
-
 openstack catalog list &>/dev/null
 [ $? -ne 0 ] && echo "Unable to list openstack catalog. Exiting.." 1>&2 && exit 1
 
