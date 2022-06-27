@@ -1,5 +1,5 @@
 data "template_file" "user_data_instance_01" {
-  template = file("../modules/vm_with_pf_rules_with_ssh_access_with_nfs_share/scripts/mount.sh")
+  template = file("../scripts/mount.sh")
   vars = {
     _SHARE_ = "${openstack_sharedfilesystem_share_v2.share_01.export_locations[0].path}"
   }

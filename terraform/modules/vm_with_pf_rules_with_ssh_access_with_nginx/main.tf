@@ -1,5 +1,5 @@
 data "template_file" "user_data_instance_01" {
-  template = file("../modules/vm_with_pf_rules_with_ssh_access_with_nginx/scripts/run_ansible.sh")
+  template = file("../scripts/run_ansible.sh")
   vars = {
     _ANSIBLE_URL_ = var.ansible_playbook_url
   }
