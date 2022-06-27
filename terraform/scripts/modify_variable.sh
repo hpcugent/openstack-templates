@@ -1,6 +1,7 @@
 #!/bin/bash
 
-vm_floating_ip_cidr="193.190.80.0/25"
+#vm_floating_ip_cidr="193.190.80.0/25"
+vm_floating_ip_cidr="172.18.245.0/24"
 vsc_floating_ip_cidr="172.24.48.0/20"
 
 openstack catalog list &>/dev/null
@@ -35,10 +36,10 @@ while read line
 do
 	ip="$(echo "$line"|awk '{print $2}')"
 	ip_id="$(echo "$line"|awk '{print $1}')"
-	python3 -c "import ipaddress; ip = ipaddress.ip_address('$(echo "$ip")') in ipaddress.ip_network('$(echo "$vm_floating_ip_cidr")'); print (ip);"|grep "True" &>/dev/null && export floating_ip_id="$ip_id" && break
+	python3 -c "import ipaddress; ip = ipaddress.ip_address('$(echo "$ip")') in ipaddress.ip_network('$(echo "$vm_floating_ip_cidr")'); print (ip);"|grep "True" &>/dev/null && export floating_ip_id="$ip_id" && export floating_ip="$ip" && break
 done < <(openstack floating ip list -f value -c "Floating IP Address" -c ID -c "Port"|grep None)
 [ -z "$floating_ip_id" ] && echo "Unable to find floating ip address. Exiting.." 1>&2 && exit 1
-echo "Using floating ip id: $floating_ip_id."
+echo "Using floating ip id: $floating_ip_id. (floating ip: $floating_ip)"
 while read line
 do
         ip="$(echo "$line"|awk '{print $1}')"
