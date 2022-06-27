@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#vm_floating_ip_cidr="193.190.80.0/25"
-vm_floating_ip_cidr="172.18.245.0/24"
+vm_floating_ip_cidr="193.190.80.0/25"
 vsc_floating_ip_cidr="172.24.48.0/20"
 
 openstack catalog list &>/dev/null
