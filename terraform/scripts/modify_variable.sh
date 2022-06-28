@@ -21,7 +21,7 @@ vsc_network_id="$(openstack network list -f value -c ID -c Name|grep '_vsc'|cut 
 vsc_subnet_id="$(openstack network list -c Subnets -c Name|grep '_vsc'|awk '{print $4}')" && \
 	echo "VSC subnet id: $vsc_subnet_id."
 
-access_key="$(openstack key list -c Name -f value|head -1)"
+access_key="$(openstack keypair list -c Name -f value|head -1)"
 [ -z "$access_key" ] && echo "Unable to find ssh access key. Exiting.." 1>&2 && exit 1
 echo "Using first ssh access key \"$access_key\"."
 
