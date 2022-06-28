@@ -3,6 +3,8 @@
 vm_floating_ip_cidr="193.190.80.0/25"
 vsc_floating_ip_cidr="172.24.48.0/20"
 
+export OS_CLOUD=openstack
+
 openstack catalog list &>/dev/null
 [ $? -ne 0 ] && echo "Unable to list openstack catalog. Exiting.." 1>&2 && exit 1
 
