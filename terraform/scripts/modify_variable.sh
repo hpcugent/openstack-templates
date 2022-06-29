@@ -3,7 +3,7 @@
 vm_floating_ip_cidr="193.190.80.0/25"
 vsc_floating_ip_cidr="172.24.48.0/20"
 
-export OS_CLOUD=openstack
+[ -z ${OS_CLOUD+x} ] && echo "Variable OS_CLOUD is not set. Using openstack as a value." && export OS_CLOUD=openstack
 
 openstack catalog list &>/dev/null
 [ $? -ne 0 ] && echo "Unable to list openstack catalog. Exiting.." 1>&2 && exit 1
@@ -49,7 +49,7 @@ done < <(openstack floating ip list -f value -c "Floating IP Address" -c "Port"|
 [ -z "$vsc_floating_ip" ] && echo "Unable to find VSC floating ip address. Exiting.." 1>&2 && exit 1
 echo "Using VSC floating ip: $vsc_floating_ip."
 
-
+echo "Modifying ../environment/main.tf file."
 sed -i "s/_VM_NETWORK_ID_/$vm_network_id/g" ../environment/main.tf
 sed -i "s/_VM_SUBNET_ID_/$vm_subnet_id/g" ../environment/main.tf
 sed -i "s/_NFS_NETWORK_ID_/$nfs_network_id/g" ../environment/main.tf
@@ -64,3 +64,6 @@ sed -i "s/_SSH_FORWARDED_PORT4_/$ssh_forwarded_port4/g" ../environment/main.tf
 sed -i "s/_HTTP_FORWARDED_PORT_/$http_forwarded_port/g" ../environment/main.tf
 sed -i "s/_FLOATING_IP_ID_/$floating_ip_id/g" ../environment/main.tf
 sed -i "s/_VSC_FLOATING_IP_/$vsc_floating_ip/g" ../environment/main.tf
+
+echo "Modifying provider.tf files."
+find ../modules/ -name *provider.tf -exec sed -i "s/_OS_CLOUD_/$OS_CLOUD/g" {} \;

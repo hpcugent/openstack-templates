@@ -8,5 +8,5 @@ terraform {
 }
 
 provider "openstack" {
-  cloud = "openstack"
+  cloud = "_OS_CLOUD_"
 }
