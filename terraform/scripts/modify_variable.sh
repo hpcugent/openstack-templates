@@ -67,3 +67,9 @@ sed -i "s/_VSC_FLOATING_IP_/$vsc_floating_ip/g" ../environment/main.tf
 
 echo "Modifying provider.tf files."
 find ../modules/ -name *provider.tf -exec sed -i "s/_OS_CLOUD_/$OS_CLOUD/g" {} \;
+
+echo "SSH commands for VMs access:"
+echo "(myvm)           ssh -p $ssh_forwarded_port1 <user>@$floating_ip -i <path_to_private_key>"
+echo "(myvm-nginx)     ssh -p $ssh_forwarded_port2 <user>@$floating_ip -i <path_to_private_key>"
+echo "(myvm-vsc_net)   ssh -p $ssh_forwarded_port3 <user>@$floating_ip -i <path_to_private_key>"
+echo "(myvm-nfs_share) ssh -p $ssh_forwarded_port4 <user>@$floating_ip -i <path_to_private_key>"
