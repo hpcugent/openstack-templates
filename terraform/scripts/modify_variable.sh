@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#script logging to modify_variable.log file
+test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@" ) | tee -a modify_variable.log ; exit $? ; }
+
 vm_floating_ip_cidr="193.190.80.0/25"
 vsc_floating_ip_cidr="172.24.48.0/20"
 
