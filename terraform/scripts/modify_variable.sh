@@ -6,11 +6,22 @@ test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@
 vm_floating_ip_cidr="193.190.80.0/25"
 vsc_floating_ip_cidr="172.24.48.0/20"
 
+. ./modify_variable.config &>/dev/null
+[ -z ${IMAGE_NAME+x} ] && echo "Variable IMAGE_NAME is not set. Exiting.." && exit 1
+[ -z ${FLAVOR_NAME+x} ] && echo "Variable FLAVOR_NAME is not set. Exiting.." && exit 1
+#export IMAGE_NAME
+#export FLAVOR_NAME
+
 [ -z ${OS_CLOUD+x} ] && echo "Variable OS_CLOUD is not set. Using openstack as a value." && export OS_CLOUD=openstack
 
 openstack catalog list &>/dev/null
 [ $? -ne 0 ] && echo "Unable to list openstack catalog. Exiting.." 1>&2 && exit 1
 
+openstack image show "$IMAGE_NAME" &>/dev/null
+[ $? -ne 0 ] && echo "Unable to locate image $IMAGE_NAME. Exiting.." 1>&2 && exit 1
+image_id="$(openstack image show "$IMAGE_NAME" -c id -f value)"
+	echo "Image id: $image_id. (Image name: $IMAGE_NAME)"
+	echo "Flavor name: $FLAVOR_NAME."
 vm_network_id="$(openstack network list -f value -c ID -c Name|grep '_vm'|cut -d ' ' -f1)" && \
 	echo "VM network id: $vm_network_id."
 vm_subnet_id="$(openstack network list -c Subnets -c Name|grep '_vm'|awk '{print $4}')" && \
@@ -53,6 +64,8 @@ done < <(openstack floating ip list -f value -c "Floating IP Address" -c "Port"|
 echo "Using VSC floating ip: $vsc_floating_ip."
 
 echo "Modifying ../environment/main.tf file."
+sed -i "s/_FLAVOR_NAME_/$FLAVOR_NAME/g" ../environment/main.tf
+sed -i "s/_IMAGE_ID_/$image_id/g" ../environment/main.tf
 sed -i "s/_VM_NETWORK_ID_/$vm_network_id/g" ../environment/main.tf
 sed -i "s/_VM_SUBNET_ID_/$vm_subnet_id/g" ../environment/main.tf
 sed -i "s/_NFS_NETWORK_ID_/$nfs_network_id/g" ../environment/main.tf

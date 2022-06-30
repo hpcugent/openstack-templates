@@ -14,7 +14,7 @@ variable "vm_name" {
 }
 variable "access_key" {
 }
-variable "image_name" {
+variable "image_id" {
 }
 variable "flavor_name" {
 }

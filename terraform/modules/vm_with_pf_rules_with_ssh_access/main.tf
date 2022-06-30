@@ -1,8 +1,16 @@
 resource "openstack_compute_instance_v2" "instance_01" {
   name = var.vm_name
-  image_name = var.image_name
   flavor_name = var.flavor_name
   key_pair = var.access_key
+
+  block_device {
+    uuid                  = var.image_id
+    source_type           = "image"
+    volume_size           = 20
+    boot_index            = 0
+    destination_type      = "volume"
+    delete_on_termination = true
+  }
 
   network {
     port = "${openstack_networking_port_v2.port_01_vm_network.id}"
