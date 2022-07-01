@@ -82,7 +82,7 @@ sed -i "s/_FLOATING_IP_ID_/$floating_ip_id/g" ../environment/main.tf
 sed -i "s/_VSC_FLOATING_IP_/$vsc_floating_ip/g" ../environment/main.tf
 
 echo "Modifying provider.tf files."
-find ../modules/ -name *provider.tf -exec sed -i "s/_OS_CLOUD_/$OS_CLOUD/g" {} \;
+find ../* -name *provider.tf -exec sed -i "s/_OS_CLOUD_/$OS_CLOUD/g" {} \;
 
 echo "SSH commands for VMs access:"
 echo "(myvm)           ssh -p $ssh_forwarded_port1 <user>@$floating_ip"
