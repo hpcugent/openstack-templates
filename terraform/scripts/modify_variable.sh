@@ -22,6 +22,8 @@ openstack image show "$IMAGE_NAME" &>/dev/null
 image_id="$(openstack image show "$IMAGE_NAME" -c id -f value)"
 	echo "Image id: $image_id. (Image name: $IMAGE_NAME)"
 	echo "Flavor name: $FLAVOR_NAME."
+root_fs_volume_size="$(openstack flavor show $FLAVOR_NAME -f value -c disk)"
+	echo "Root FS volume size based on flavor disk size: $root_fs_volume_size."
 vm_network_id="$(openstack network list -f value -c ID -c Name|grep '_vm'|cut -d ' ' -f1)" && \
 	echo "VM network id: $vm_network_id."
 vm_subnet_id="$(openstack network list -c Subnets -c Name|grep '_vm'|awk '{print $4}')" && \
@@ -65,6 +67,7 @@ echo "Using VSC floating ip: $vsc_floating_ip."
 
 echo "Modifying ../environment/main.tf file."
 sed -i "s/_FLAVOR_NAME_/$FLAVOR_NAME/g" ../environment/main.tf
+sed -i "s/_ROOT_FS_VOLUME_SIZE_/$root_fs_volume_size/g" ../environment/main.tf
 sed -i "s/_IMAGE_ID_/$image_id/g" ../environment/main.tf
 sed -i "s/_VM_NETWORK_ID_/$vm_network_id/g" ../environment/main.tf
 sed -i "s/_VM_SUBNET_ID_/$vm_subnet_id/g" ../environment/main.tf

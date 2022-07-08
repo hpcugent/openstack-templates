@@ -14,7 +14,7 @@ resource "openstack_compute_instance_v2" "instance_01" {
   block_device {
     uuid                  = var.image_id
     source_type           = "image"
-    volume_size           = 20
+    volume_size           = var.root_fs_volume_size
     boot_index            = 0
     destination_type      = "volume"
     delete_on_termination = true
