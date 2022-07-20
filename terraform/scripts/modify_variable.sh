@@ -3,14 +3,11 @@
 #script logging to modify_variable.log file
 test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@" ) | tee -a modify_variable.log ; exit $? ; }
 
-vm_floating_ip_cidr="193.190.80.0/25"
-vsc_floating_ip_cidr="172.24.48.0/20"
-
 . ./modify_variable.config &>/dev/null
 [ -z ${IMAGE_NAME+x} ] && echo "Variable IMAGE_NAME is not set. Exiting.." && exit 1
 [ -z ${FLAVOR_NAME+x} ] && echo "Variable FLAVOR_NAME is not set. Exiting.." && exit 1
-#export IMAGE_NAME
-#export FLAVOR_NAME
+[ -z ${vm_floating_ip_cidr+x} ] && echo "Variable vm_floating_ip_cidr is not set. Exiting.." && exit 1
+[ -z ${vsc_floating_ip_cidr+x} ] && echo "Variable vsc_floating_ip_cidr is not set. Exiting.." && exit 1
 
 [ -z ${OS_CLOUD+x} ] && echo "Variable OS_CLOUD is not set. Using openstack as a value." && export OS_CLOUD=openstack
 
