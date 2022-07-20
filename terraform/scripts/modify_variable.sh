@@ -41,14 +41,6 @@ access_key="$(openstack keypair list -c Name -f value|head -1)"
 [ -z "$access_key" ] && echo "Unable to find ssh access key. Exiting.." 1>&2 && exit 1
 echo "Using first ssh access key \"$access_key\"."
 
-ssh_forwarded_port1="$(shuf -i 51001-59999 -n 1)"
-ssh_forwarded_port2="$(shuf -i 51001-59999 -n 1)"
-ssh_forwarded_port3="$(shuf -i 51001-59999 -n 1)"
-ssh_forwarded_port4="$(shuf -i 51001-59999 -n 1)"
-http_forwarded_port="$(shuf -i 51001-59999 -n 1)"
-echo "Using ssh forwarded ports: $ssh_forwarded_port1 $ssh_forwarded_port2 $ssh_forwarded_port3 $ssh_forwarded_port4."
-echo "Using http forwarded port: $http_forwarded_port."
-
 while read line
 do
 	ip="$(echo "$line"|awk '{print $2}')"
@@ -64,6 +56,23 @@ do
 done < <(openstack floating ip list -f value -c "Floating IP Address" -c "Port"|grep None)
 [ -z "$vsc_floating_ip" ] && echo "Unable to find VSC floating ip address. Exiting.." 1>&2 && exit 1
 echo "Using VSC floating ip: $vsc_floating_ip."
+
+generate_new_free_port () {
+        allocated_ports="$(openstack floating ip port forwarding list "$floating_ip_id" -f value -c "External Port"|sort|uniq)"
+        for i in $(seq 100)
+        do
+                port="$(shuf -i 51001-59999 -n 1)"
+                echo "$allocated_ports"|grep "$port" &>/dev/null
+                [ $? -ne 0 ] && new_port="$port" && break
+        done
+}
+generate_new_free_port && ssh_forwarded_port1="$new_port"
+generate_new_free_port && ssh_forwarded_port2="$new_port"
+generate_new_free_port && ssh_forwarded_port3="$new_port"
+generate_new_free_port && ssh_forwarded_port4="$new_port"
+generate_new_free_port && http_forwarded_port="$new_port"
+echo "Using ssh forwarded ports: $ssh_forwarded_port1 $ssh_forwarded_port2 $ssh_forwarded_port3 $ssh_forwarded_port4."
+echo "Using http forwarded port: $http_forwarded_port."
 
 echo "Modifying ../environment/main.tf file."
 sed -i "s/_FLAVOR_NAME_/$FLAVOR_NAME/g" ../environment/main.tf
