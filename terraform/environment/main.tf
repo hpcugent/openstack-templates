@@ -58,8 +58,8 @@ module "vm_with_pf_rules_with_ssh_access_with_nfs_share" {
   image_id             = "_IMAGE_ID_"
   flavor_name          = "_FLAVOR_NAME_"
   ssh_forwarded_port   = "_SSH_FORWARDED_PORT4_"
-  share_name           = "MyShare"
-  share_size           = "10"
+  share_name           = "_SHARE_NAME_"
+  share_size           = "_SHARE_SIZE_"
   root_fs_volume_size  = "_ROOT_FS_VOLUME_SIZE_"
 }
 

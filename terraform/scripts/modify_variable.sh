@@ -6,6 +6,8 @@ test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@
 . ./modify_variable.config &>/dev/null
 [ -z ${IMAGE_NAME+x} ] && echo "Variable IMAGE_NAME is not set. Exiting.." && exit 1
 [ -z ${FLAVOR_NAME+x} ] && echo "Variable FLAVOR_NAME is not set. Exiting.." && exit 1
+[ -z ${SHARE_NAME+x} ] && echo "Variable SHARE_NAME is not set. Exiting.." && exit 1
+[ -z ${SAHRE_SIZE+x} ] && echo "Variable SHARE_SIZE is not set. Exiting.." && exit 1
 [ -z ${vm_floating_ip_cidr+x} ] && echo "Variable vm_floating_ip_cidr is not set. Exiting.." && exit 1
 [ -z ${vsc_floating_ip_cidr+x} ] && echo "Variable vsc_floating_ip_cidr is not set. Exiting.." && exit 1
 
@@ -73,6 +75,8 @@ echo "Using http forwarded port: $http_forwarded_port."
 
 echo "Modifying ../environment/main.tf file."
 sed -i "s/_FLAVOR_NAME_/$FLAVOR_NAME/g" ../environment/main.tf
+sed -i "s/_SHARE_NAME_/$SHARE_NAME/g" ../environment/main.tf
+sed -i "s/_SHARE_SIZE_/$SHARE_SIZE/g" ../environment/main.tf
 sed -i "s/_ROOT_FS_VOLUME_SIZE_/$root_fs_volume_size/g" ../environment/main.tf
 sed -i "s/_IMAGE_ID_/$image_id/g" ../environment/main.tf
 sed -i "s/_VM_NETWORK_ID_/$vm_network_id/g" ../environment/main.tf
