@@ -18,3 +18,5 @@ variable "http_forwarded_port" {
 }
 variable "ansible_playbook_url" {
 }
+variable "root_fs_volume_size" {
+}

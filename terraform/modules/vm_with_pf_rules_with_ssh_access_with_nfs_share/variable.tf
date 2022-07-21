@@ -22,3 +22,5 @@ variable "share_name" {
 }
 variable "share_size" {
 }
+variable "root_fs_volume_size" {
+}

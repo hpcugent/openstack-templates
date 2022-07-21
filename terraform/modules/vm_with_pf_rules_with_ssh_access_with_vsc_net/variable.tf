@@ -20,3 +20,5 @@ variable "flavor_name" {
 }
 variable "ssh_forwarded_port" {
 }
+variable "root_fs_volume_size" {
+}
