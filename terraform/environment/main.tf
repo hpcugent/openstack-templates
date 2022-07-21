@@ -1,7 +1,7 @@
 module "vm_with_pf_rules_with_ssh_access" {
   source   = "../modules/vm_with_pf_rules_with_ssh_access"
 
-  vm_name              = "MyVM"
+  vm_name              = "_VM_BASE_NAME_"
   floating_ip_id       = "_FLOATING_IP_ID_"
   vm_network_id        = "_VM_NETWORK_ID_"
   vm_subnet_id         = "_VM_SUBNET_ID_"
@@ -15,7 +15,7 @@ module "vm_with_pf_rules_with_ssh_access" {
 module "vm_with_pf_rules_with_ssh_access_with_nginx" {
   source   = "../modules/vm_with_pf_rules_with_ssh_access_with_nginx"
 
-  vm_name              = "MyVM-nginx"
+  vm_name              = "_VM_BASE_NAME_-nginx"
   floating_ip_id       = "_FLOATING_IP_ID_"
   vm_network_id        = "_VM_NETWORK_ID_"
   vm_subnet_id         = "_VM_SUBNET_ID_"
@@ -31,7 +31,7 @@ module "vm_with_pf_rules_with_ssh_access_with_nginx" {
 module "vm_with_pf_rules_with_ssh_access_with_vsc_net" {
   source   = "../modules/vm_with_pf_rules_with_ssh_access_with_vsc_net"
 
-  vm_name              = "MyVM-vsc_net"
+  vm_name              = "_VM_BASE_NAME_-vsc_net"
   floating_ip_id       = "_FLOATING_IP_ID_"
   vsc_floating_ip      = "_VSC_FLOATING_IP_"
   vm_network_id        = "_VM_NETWORK_ID_"
@@ -48,7 +48,7 @@ module "vm_with_pf_rules_with_ssh_access_with_vsc_net" {
 module "vm_with_pf_rules_with_ssh_access_with_nfs_share" {
   source   = "../modules/vm_with_pf_rules_with_ssh_access_with_nfs_share"
 
-  vm_name              = "MyVM-nfs_share"
+  vm_name              = "_VM_BASE_NAME_-nfs_share"
   floating_ip_id       = "_FLOATING_IP_ID_"
   vm_network_id        = "_VM_NETWORK_ID_"
   vm_subnet_id         = "_VM_SUBNET_ID_"
