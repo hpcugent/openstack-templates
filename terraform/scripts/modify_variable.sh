@@ -7,7 +7,7 @@ test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@
 [ -z ${IMAGE_NAME+x} ] && echo "Variable IMAGE_NAME is not set. Exiting.." 1>&2 && exit 1
 [ -z ${FLAVOR_NAME+x} ] && echo "Variable FLAVOR_NAME is not set. Exiting.." 1>&2 && exit 1
 [ -z ${SHARE_NAME+x} ] && echo "Variable SHARE_NAME is not set. Exiting.." 1>&2 && exit 1
-[ -z ${SAHRE_SIZE+x} ] && echo "Variable SHARE_SIZE is not set. Exiting.." 1>&2 && exit 1
+[ -z ${SHARE_SIZE+x} ] && echo "Variable SHARE_SIZE is not set. Exiting.." 1>&2 && exit 1
 [ -z ${VM_BASE_NAME+x} ] && echo "Variable VM_BASE_NAME is not set. Exiting.." 1>&2 && exit 1
 [ -z ${vm_floating_ip_cidr+x} ] && echo "Variable vm_floating_ip_cidr is not set. Exiting.." 1>&2 && exit 1
 [ -z ${vsc_floating_ip_cidr+x} ] && echo "Variable vsc_floating_ip_cidr is not set. Exiting.." 1>&2 && exit 1
