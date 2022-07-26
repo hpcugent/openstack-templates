@@ -79,6 +79,16 @@ echo "Using ssh forwarded ports: $ssh_forwarded_port1 $ssh_forwarded_port2 $ssh_
 echo "Using http forwarded port: $http_forwarded_port."
 
 echo "Modifying ../environment/main.tf file."
+
+[ "$nfs_network_id" == "" ] && \
+        echo "WARNING: Missing \$nfs_network_id. Commenting out vm_with_pf_rules_with_ssh_access_with_nfs_share module in ../environment/main.tf file." && \
+        awk '/module.*vm_with_pf_rules_with_ssh_access_with_nfs_share/,/}/{$0="#"$0}1' ../environment/main.tf  > ../environment/main.tf_new && \
+        mv ../environment/main.tf_new ../environment/main.tf
+[ "$vsc_network_id" == "" ] && \
+        echo "WARNING: Missing \$vsc_network_id. Commenting out vm_with_pf_rules_with_ssh_access_with_vsc_net module in ../environment/main.tf file." && \
+        awk '/module.*vm_with_pf_rules_with_ssh_access_with_vsc_net/,/}/{$0="#"$0}1' ../environment/main.tf  > ../environment/main.tf_new && \
+        mv ../environment/main.tf_new ../environment/main.tf
+
 sed -i "s/_FLAVOR_NAME_/$FLAVOR_NAME/g" ../environment/main.tf
 sed -i "s/_SHARE_NAME_/$SHARE_NAME/g" ../environment/main.tf
 sed -i "s/_SHARE_SIZE_/$SHARE_SIZE/g" ../environment/main.tf
