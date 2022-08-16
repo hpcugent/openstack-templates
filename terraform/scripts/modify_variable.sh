@@ -79,6 +79,22 @@ echo "Using ssh forwarded ports: $ssh_forwarded_port1 $ssh_forwarded_port2 $ssh_
 echo "Using http forwarded port: $http_forwarded_port."
 
 echo "Modifying ../environment/main.tf file."
+
+verify_variable() {
+        #usage: verify_variable "variable to check" "module to comment out if variable is empty"
+        variable="$1"
+        module_to_comment_out="$2"
+        if [ "${!variable}" == "" ]
+        then
+                echo "WARNING: Missing \$$variable. Commenting out $module_to_comment_out module in ../environment/main.tf file."
+                awk "/module.*$module_to_comment_out/,/}/{\$0=\"#\"\$0}1" ../environment/main.tf  > ../environment/main.tf_new
+                mv ../environment/main.tf_new ../environment/main.tf
+        fi
+}
+
+verify_variable "nfs_network_id" "vm_with_pf_rules_with_ssh_access_with_nfs_share"
+verify_variable "vsc_network_id" "vm_with_pf_rules_with_ssh_access_with_vsc_net"
+
 sed -i "s/_FLAVOR_NAME_/$FLAVOR_NAME/g" ../environment/main.tf
 sed -i "s/_SHARE_NAME_/$SHARE_NAME/g" ../environment/main.tf
 sed -i "s/_SHARE_SIZE_/$SHARE_SIZE/g" ../environment/main.tf
