@@ -1,5 +1,42 @@
 #!/bin/bash
 
+OPTION=""
+KEEP_PF_PORTS=false
+
+usage() {
+  echo "Usage: $0 [ -u UPDATE_TYPE ]" 1>&2
+  echo "-u keep-pf-ports (optional: updates TF variables but it keeps same portforwarding ports)"
+}
+
+exit_abnormal() {
+  usage
+  exit 1
+}
+
+while getopts ":u:" options; do
+  case "${options}" in
+    u)
+      OPTION=${OPTARG}
+      if [[ $OPTION == "keep-pf-ports" ]] ; then
+        KEEP_PF_PORTS=true
+      else
+        exit_abnormal
+      fi
+      ;;
+    :)
+      echo "Error: -${OPTARG} requires an argument."
+      exit_abnormal
+      ;;
+    *)
+      exit_abnormal
+      ;;
+  esac
+done
+
+if [ "$OPTION" = "" ]; then
+  KEEP_PF_PORTS=false
+fi
+
 #script logging to modify_variable.log file
 test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@" ) | tee -a modify_variable.log ; exit $? ; }
 
@@ -70,15 +107,20 @@ generate_new_free_port () {
                 [ $? -ne 0 ] && new_port="$port" && break
         done
 }
-generate_new_free_port && ssh_forwarded_port1="$new_port"
-generate_new_free_port && ssh_forwarded_port2="$new_port"
-generate_new_free_port && ssh_forwarded_port3="$new_port"
-generate_new_free_port && ssh_forwarded_port4="$new_port"
+
+for suffix in $(seq 1 4); do
+    generate_new_free_port
+    declare ssh_forwarded_port$suffix="$new_port"
+done
 generate_new_free_port && http_forwarded_port="$new_port"
+
 echo "Using ssh forwarded ports: $ssh_forwarded_port1 $ssh_forwarded_port2 $ssh_forwarded_port3 $ssh_forwarded_port4."
 echo "Using http forwarded port: $http_forwarded_port."
 
 echo "Modifying ../environment/main.tf file."
+
+# main.tf is overrided and new external ports are generated each run
+yes| cp -rf ../environment/main.tf.template ../environment/main.tf
 
 verify_variable() {
         #usage: verify_variable "variable to check" "module to comment out if variable is empty"
@@ -108,11 +150,15 @@ sed -i "s/_NFS_SUBNET_ID_/$nfs_subnet_id/g" ../environment/main.tf
 sed -i "s/_VSC_NETWORK_ID_/$vsc_network_id/g" ../environment/main.tf
 sed -i "s/_VSC_SUBNET_ID_/$vsc_subnet_id/g" ../environment/main.tf
 sed -i "s/_ACCESS_KEY_/$access_key/g" ../environment/main.tf
-sed -i "s/_SSH_FORWARDED_PORT1_/$ssh_forwarded_port1/g" ../environment/main.tf
-sed -i "s/_SSH_FORWARDED_PORT2_/$ssh_forwarded_port2/g" ../environment/main.tf
-sed -i "s/_SSH_FORWARDED_PORT3_/$ssh_forwarded_port3/g" ../environment/main.tf
-sed -i "s/_SSH_FORWARDED_PORT4_/$ssh_forwarded_port4/g" ../environment/main.tf
+
+
+for suffix in $(seq 1 4); do
+    port=ssh_forwarded_port${suffix}
+    sed -i "s/_SSH_FORWARDED_PORT${suffix}_/${!port}/g" ../environment/main.tf
+done
 sed -i "s/_HTTP_FORWARDED_PORT_/$http_forwarded_port/g" ../environment/main.tf
+
+
 sed -i "s/_FLOATING_IP_ID_/$floating_ip_id/g" ../environment/main.tf
 sed -i "s/_VSC_FLOATING_IP_/$vsc_floating_ip/g" ../environment/main.tf
 
