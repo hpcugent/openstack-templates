@@ -1,44 +1,31 @@
 #!/bin/bash
 
-OPTION=""
-KEEP_PF_PORTS=false
-
-usage() {
-  echo "Usage: $0 [ -u UPDATE_TYPE ]" 1>&2
-  echo "-u keep-pf-ports (optional: updates TF variables but it keeps same portforwarding ports)"
+Help() {
+    echo
+    echo "options:"
+    echo "-h     Print this Help."
+    echo "-k     (optional) updates TF variables but it keeps same portforwarding ports"
+    echo
 }
 
-exit_abnormal() {
-  usage
-  exit 1
-}
+KEEP_PF_PORTS="false"
 
-while getopts ":u:" options; do
-  case "${options}" in
-    u)
-      OPTION=${OPTARG}
-      if [[ $OPTION == "keep-pf-ports" ]] ; then
-        KEEP_PF_PORTS=true
-      else
-        exit_abnormal
-      fi
-      ;;
-    :)
-      echo "Error: -${OPTARG} requires an argument."
-      exit_abnormal
-      ;;
-    *)
-      exit_abnormal
-      ;;
-  esac
+while getopts ":hk" option; do
+   case $option in
+      h) # display Help
+         Help
+         exit;;
+      k) # Keep ports
+         KEEP_PF_PORTS="true";;
+     \?) # Invalid option
+         echo "Error: Invalid option"
+         Help
+         exit;;
+   esac
 done
 
-if [ "$OPTION" = "" ]; then
-  KEEP_PF_PORTS=false
-fi
-
 #script logging to modify_variable.log file
-test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@" ) | tee -a modify_variable.log ; exit $? ; }
+#test x$1 = x$'\x00' && shift || { set -o pipefail ; ( exec 2>&1 ; $0 $'\x00' "$@" ) | tee -a modify_variable.log ; exit $? ; }
 
 . ./modify_variable.config &>/dev/null
 [ -z ${IMAGE_NAME+x} ] && echo "Variable IMAGE_NAME is not set. Exiting.." 1>&2 && exit 1
@@ -108,14 +95,6 @@ generate_new_free_port () {
         done
 }
 
-for suffix in $(seq 1 4); do
-    generate_new_free_port
-    declare ssh_forwarded_port$suffix="$new_port"
-done
-generate_new_free_port && http_forwarded_port="$new_port"
-
-echo "Using ssh forwarded ports: $ssh_forwarded_port1 $ssh_forwarded_port2 $ssh_forwarded_port3 $ssh_forwarded_port4."
-echo "Using http forwarded port: $http_forwarded_port."
 
 echo "Modifying ../environment/main.tf file."
 
@@ -152,12 +131,37 @@ sed -i "s/_VSC_SUBNET_ID_/$vsc_subnet_id/g" ../environment/main.tf
 sed -i "s/_ACCESS_KEY_/$access_key/g" ../environment/main.tf
 
 
+if [[ "$KEEP_PF_PORTS" = 'false' ]]; then
+  truncate -s 0 ../environment/used_ports.out
+  for suffix in $(seq 1 4); do
+    generate_new_free_port
+    declare ssh_forwarded_port$suffix="$new_port"
+  done
+  generate_new_free_port && http_forwarded_port="$new_port"
+else
+  echo "keep-pf-ports enabled, keeping old port forwarding ports"
+  grep ssh_forwarded_port ../environment/main.tf
+  index=1
+  while IFS= read -r line; do
+    if [[ "$index" -eq 5 ]]; then
+      declare http_forwarded_port="$line"
+    else
+      declare ssh_forwarded_port$index="$line"
+    fi
+    ((index++))
+  done < ../environment/used_ports.out
+fi
+
+echo "Using ssh forwarded ports: $ssh_forwarded_port1 $ssh_forwarded_port2 $ssh_forwarded_port3 $ssh_forwarded_port4."
+echo "Using http forwarded port: $http_forwarded_port."
+
 for suffix in $(seq 1 4); do
-    port=ssh_forwarded_port${suffix}
-    sed -i "s/_SSH_FORWARDED_PORT${suffix}_/${!port}/g" ../environment/main.tf
+  port=ssh_forwarded_port${suffix}
+  sed -i "s/_SSH_FORWARDED_PORT${suffix}_/${!port}/g" ../environment/main.tf
+  echo "${!port}" >> ../environment/used_ports.out
 done
 sed -i "s/_HTTP_FORWARDED_PORT_/$http_forwarded_port/g" ../environment/main.tf
-
+echo "$http_forwarded_port" >> ../environment/used_ports.out
 
 sed -i "s/_FLOATING_IP_ID_/$floating_ip_id/g" ../environment/main.tf
 sed -i "s/_VSC_FLOATING_IP_/$vsc_floating_ip/g" ../environment/main.tf
