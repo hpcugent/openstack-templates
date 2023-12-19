@@ -185,5 +185,5 @@ echo "(${VM_BASE_NAME})           ssh -p $ssh_forwarded_port1 <user>@$floating_i
 echo "(${VM_BASE_NAME}-nginx)     ssh -p $ssh_forwarded_port2 <user>@$floating_ip"
 echo "(${VM_BASE_NAME}-vsc_net)   ssh -p $ssh_forwarded_port3 <user>@$floating_ip"
 echo "(${VM_BASE_NAME}-nfs_share) ssh -p $ssh_forwarded_port4 <user>@$floating_ip"
-echo "(${VM_BASE_NAME}-windows)   rdesktop $floating_ip:$ssh_forwarded_port5"
+echo "(${VM_BASE_NAME}-windows)   xfreerdp /u:admin /port:${ssh_forwarded_port5} /v:${floating_ip}"
 echo
