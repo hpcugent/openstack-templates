@@ -63,3 +63,17 @@ module "vm_with_pf_rules_with_ssh_access_with_nfs_share" {
   root_fs_volume_size  = "_ROOT_FS_VOLUME_SIZE_"
 }
 
+module "vm_with_windows_with_remote_desktop" {
+  source   = "../modules/vm_with_windows_with_remote_desktop"
+
+  vm_name                = "_VM_BASE_NAME_-windows"
+  floating_ip_id         = "_FLOATING_IP_ID_"
+  vm_network_id          = "_VM_NETWORK_ID_"
+  vm_subnet_id           = "_VM_SUBNET_ID_"
+  access_key             = "_ACCESS_KEY_"
+  image_windows_id       = "_IMAGE_WINDOWS_ID_"
+  flavor_name            = "_FLAVOR_NAME_"
+  ssh_forwarded_port     = "_SSH_FORWARDED_PORT5_"
+  root_fs_volume_size    = "_ROOT_FS_VOLUME_SIZE_"
+  windows_admin_password = "_WINDOWS_ADMIN_PASSWORD_"
+}
