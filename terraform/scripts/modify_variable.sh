@@ -92,7 +92,8 @@ done < <(openstack floating ip list -f value -c "Floating IP Address" -c "Port"|
 echo "Using VSC floating ip: $vsc_floating_ip."
 
 generate_new_free_port () {
-  allocated_ports=$(openstack floating ip port forwarding list "$floating_ip_id" -f value -c "External Port"|sort|uniq)
+  column="External Port"
+  allocated_ports=$(openstack floating ip port forwarding list "$floating_ip_id" -f value -c "$column" --sort-column "$column")
   for i in $(seq 100); do
     port="$(shuf -i 51001-59999 -n 1)"
     if [[ ! " $allocated_ports " =~ " $port " ]]; then
