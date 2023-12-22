@@ -88,7 +88,7 @@ do
 		print (ip);"|grep "True" &>/dev/null && export vsc_floating_ip="$ip" && \
 		break
 done < <(openstack floating ip list -f value -c "Floating IP Address" -c "Port"|grep None)
-[ -z "$vsc_floating_ip" ] && echo "Unable to find VSC floating ip address. Exiting.." 1>&2 && exit 1
+[ -z "$vsc_floating_ip" ] && echo "VSC floating ip address not present."
 echo "Using VSC floating ip: $vsc_floating_ip."
 
 generate_new_free_port () {
