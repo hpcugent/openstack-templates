@@ -1,7 +1,7 @@
 module "main" {
   source        = "../single_instance"
   vm_name       = "${var.cluster_name}-public"
-  image_name    = var.public_image_name
+  image_name    = var.public_image
   flavor_name   = var.public_flavor
   nginx_enabled = var.public_nginx_enabled
   cloud         = var.cloud

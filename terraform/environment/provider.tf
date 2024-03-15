@@ -6,7 +6,6 @@ terraform {
     }
   }
 }
-
 provider "openstack" {
-  cloud = "openstack"
+  cloud = var.cloud
 }

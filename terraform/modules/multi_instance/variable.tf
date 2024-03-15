@@ -1,9 +1,9 @@
 variable "cluster_name" {
 }
-variable "public_image_name" {
+variable "public_image" {
 
 }
-variable "private_image_name" {
+variable "private_image" {
   default = "default"
 }
 variable "access_key" {
@@ -36,6 +36,6 @@ variable "private_count" {
   type = number
 }
 locals {
-  private_image = var.private_image_name == "default" ? var.public_image_name : var.private_image_name
+  private_image = var.private_image == "default" ? var.public_image : var.private_image
   private_flavor = var.private_flavor == "default" ? var.public_flavor : var.private_flavor
 }
