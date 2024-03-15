@@ -46,6 +46,7 @@ resource "openstack_networking_port_v2" "vm" {
 }
 
 resource "openstack_networking_portforwarding_v2" "ssh" {
+  count = var.public ? 1 : 0
   floatingip_id    = data.openstack_networking_floatingip_v2.public.id
   external_port    = local.ports.ssh
   internal_port    = local.ssh_internal_port

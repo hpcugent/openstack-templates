@@ -32,3 +32,7 @@ variable "nfs_size" {
 variable "cloud" {
   default = "openstack"
 }
+variable "public" {
+  default = true
+  type = bool
+}
