@@ -2,7 +2,4 @@ environment/terraform.tfstate.backup
 environment/terraform.tfstate
 environment/.terraform/*
 environment/.terraform.lock.hcl
-scripts/modify_variable.log
-environment/terraform.tfvars
-environment/used_ports.out
 environment/port_*.json
