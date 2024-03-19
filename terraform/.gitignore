@@ -3,3 +3,4 @@ environment/terraform.tfstate
 environment/.terraform/*
 environment/.terraform.lock.hcl
 environment/port_*.json
+environment/main.tf

@@ -36,6 +36,6 @@ variable "private_count" {
   type = number
 }
 locals {
-  private_image = var.private_image == "default" ? var.public_image : var.private_image
+  private_image  = var.private_image == "default" ? var.public_image : var.private_image
   private_flavor = var.private_flavor == "default" ? var.public_flavor : var.private_flavor
 }

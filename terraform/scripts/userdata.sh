@@ -20,12 +20,11 @@ if [ -n "$META_SHARE" ]; then
 fi
 
 if $NFS ; then
-    mount ${_SHARE_} /mnt
+    mount "${_SHARE_}" /mnt
 fi
 if $ANSIBLE ;then
-    OS="$(grep ^NAME= /etc/os-release |tr \"[:upper:]\" \"[:lower:]\")"
     [[ $OS =~ "red hat enterprise linux" || $OS =~ "centos" || $OS =~ "rocky" || $OS =~ "alma" ]] && yum -y install epel-release && yum -y install ansible
     [[ $OS =~ "debian" || $OS =~ "ubuntu" ]] && apt-get update && apt-get -y install ansible
-    curl -s -L --connect-timeout 60 -o /tmp/my_playbook.yaml ${_ANSIBLE_URL_}
+    curl -s -L --connect-timeout 60 -o /tmp/my_playbook.yaml "${_ANSIBLE_URL_}"
     ansible-playbook /tmp/my_playbook.yaml
 fi

@@ -25,7 +25,7 @@ output "main" {
   value = module.main.Connections
 }
 locals {
-  private_connections = join("\n",[for instance in module.private : "${instance.Name}:\n ${instance.Connections}"])
+  private_connections = join("\n", [for instance in module.private : "${instance.Name}:\n ${instance.Connections}"])
 }
 output "Connections" {
   value = <<EOT
