@@ -15,7 +15,7 @@ resource "shell_script" "port_ssh" {
     "IP_ID"      = data.openstack_networking_floatingip_v2.public.id
     "PORT_COUNT" = 1
     "PORT_NAME" = "${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_ssh"
-    OS_CLOUD=var.cloud
+    "OS_CLOUD" = var.cloud
   }
   lifecycle_commands {
     create = file("../scripts/generate_port.sh")
@@ -32,6 +32,7 @@ resource "shell_script" "port_ssh" {
 resource "shell_script" "port_http" {
   count = var.nginx_enabled ? 1 : 0
   environment = {
+    "OS_CLOUD" = var.cloud
     "IP_ID"      = data.openstack_networking_floatingip_v2.public.id
     "PORT_COUNT" = 1
     "PORT_NAME" = "${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_http"
