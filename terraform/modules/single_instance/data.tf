@@ -14,16 +14,16 @@ resource "shell_script" "port_ssh" {
   environment = {
     "IP_ID"      = data.openstack_networking_floatingip_v2.public.id
     "PORT_COUNT" = 1
-    "PORT_NAME" = "${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_ssh"
-    "OS_CLOUD" = var.cloud
+    "PORT_NAME"  = "${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id, 0, 4)}_ssh"
+    "OS_CLOUD"   = var.cloud
   }
   lifecycle_commands {
     create = file("../scripts/generate_port.sh")
     delete = <<-EOF
-      rm -rf "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_ssh.json"
+      rm -rf "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id, 0, 4)}_ssh.json"
     EOF
-    read = <<-EOF
-      cat "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_ssh.json"
+    read   = <<-EOF
+      cat "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id, 0, 4)}_ssh.json"
     EOF
   }
   working_directory = path.root
@@ -32,18 +32,18 @@ resource "shell_script" "port_ssh" {
 resource "shell_script" "port_http" {
   count = var.nginx_enabled ? 1 : 0
   environment = {
-    "OS_CLOUD" = var.cloud
+    "OS_CLOUD"   = var.cloud
     "IP_ID"      = data.openstack_networking_floatingip_v2.public.id
     "PORT_COUNT" = 1
-    "PORT_NAME" = "${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_http"
+    "PORT_NAME"  = "${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id, 0, 4)}_http"
   }
   lifecycle_commands {
     create = file("../scripts/generate_port.sh")
     delete = <<-EOF
-      rm -rf "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_http.json"
+      rm -rf "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id, 0, 4)}_http.json"
     EOF
-    read = <<-EOF
-      cat "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id,0,4)}_http.json"
+    read   = <<-EOF
+      cat "port_${var.vm_name}-${substr(openstack_compute_instance_v2.instance_01.id, 0, 4)}_http.json"
     EOF
   }
   working_directory = path.root
