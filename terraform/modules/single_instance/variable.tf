@@ -36,3 +36,11 @@ variable "public" {
   default = true
   type    = bool
 }
+
+variable "volumes" {
+  type = map(object({
+    size = number
+    fstype = string
+  }))
+  default = {}
+}
