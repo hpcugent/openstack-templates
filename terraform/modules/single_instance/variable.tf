@@ -40,8 +40,8 @@ variable "public" {
 variable "volumes" {
   type = map(object({
     size = number
-    fstype = string
   }))
+  default = {}
 }
 variable "custom_secgroup_rules" {
   type = map(object({
