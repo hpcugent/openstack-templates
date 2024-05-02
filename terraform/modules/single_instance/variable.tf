@@ -42,5 +42,12 @@ variable "volumes" {
     size = number
     fstype = string
   }))
+}
+variable "custom_secgroup_rules" {
+  type = map(object({
+    port = number
+    remote_ip_prefix = string
+    protocol = string
+  }))
   default = {}
 }
