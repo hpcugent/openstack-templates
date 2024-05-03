@@ -2,11 +2,6 @@ resource "openstack_blockstorage_volume_v3" "custom_volume" {
   for_each = var.volumes
   name = each.key
   size = each.value.size
-  # This -should- create the filesystem, but it doesnt. 
-  # metadata = {
-  #   fstype = each.value.fstype
-  #   fslabel = each.key
-  # }
 }
 
 resource "openstack_compute_volume_attach_v2" "custom_volume" {
