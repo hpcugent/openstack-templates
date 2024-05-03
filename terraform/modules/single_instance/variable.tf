@@ -36,3 +36,18 @@ variable "public" {
   default = true
   type    = bool
 }
+
+variable "volumes" {
+  type = map(object({
+    size = number
+  }))
+  default = {}
+}
+variable "custom_secgroup_rules" {
+  type = map(object({
+    port = number
+    remote_ip_prefix = string
+    protocol = string
+  }))
+  default = {}
+}
