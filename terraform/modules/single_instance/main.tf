@@ -3,6 +3,9 @@ resource "openstack_blockstorage_volume_v3" "root" {
   size     = local.disk_size
   image_id = var.image_name
   enable_online_resize = true
+  lifecycle {
+    ignore_changes = [ image_id, source_vol_id]
+  }
 }
 
 resource "openstack_compute_instance_v2" "instance_01" {
