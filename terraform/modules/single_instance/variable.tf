@@ -51,3 +51,6 @@ variable "custom_secgroup_rules" {
   }))
   default = {}
 }
+variable "rootdisk_size" {
+  default = "default"
+}

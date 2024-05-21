@@ -1,12 +1,18 @@
+resource "openstack_blockstorage_volume_v3" "root" {
+  name     = "${var.vm_name}-root"
+  size     = local.disk_size
+  image_id = var.image_name
+  enable_online_resize = true
+}
+
 resource "openstack_compute_instance_v2" "instance_01" {
   name        = var.vm_name
   flavor_name = var.flavor_name
   key_pair    = local.access_key
   user_data   = file("../scripts/userdata.sh")
   block_device {
-    uuid                  = data.openstack_images_image_ids_v2.image.ids[0]
-    source_type           = "image"
-    volume_size           = data.openstack_compute_flavor_v2.flavor.disk
+    uuid                  = openstack_blockstorage_volume_v3.root.id
+    source_type           = "volume"
     boot_index            = 0
     destination_type      = "volume"
     delete_on_termination = true

@@ -9,6 +9,8 @@ locals {
   ssh_internal_port = local.is_windows ? 3389 : 22
   project_name      = var.project_name == "default" ? data.shell_script.project.output["Name"] : var.project_name
   access_key        = var.access_key == "default" ? data.shell_script.access_key.output["Name"] : var.access_key
+  disk_var          = var.rootdisk_size == "default" ? data.openstack_compute_flavor_v2.flavor.disk : var.rootdisk_size
+  disk_size         = local.is_windows ? max(local.disk_var,60) : local.disk_var
 }
 resource "shell_script" "port_ssh" {
   environment = {
