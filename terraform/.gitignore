@@ -1,5 +1,4 @@
-environment/terraform.tfstate.backup
-environment/terraform.tfstate
+environment/terraform.tfstate*
 environment/.terraform/*
 environment/.terraform.lock.hcl
 environment/port_*.json
