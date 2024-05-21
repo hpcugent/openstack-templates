@@ -28,6 +28,6 @@ locals {
   ssh_user           = contains(keys(local.ssh_users), var.image_name) ? local.ssh_users[var.image_name] : "root"
   private_ssh_string = "SSH: ssh -A ${local.ssh_user}@${openstack_compute_instance_v2.instance_01.network[0].fixed_ip_v4}"
   ssh_string         = var.public ? "SSH: ssh -A -p ${local.ports.ssh} ${local.ssh_user}@${data.openstack_networking_floatingip_v2.public.address}" : local.private_ssh_string
-  windows_string     = "xfreerdp /u:admin /port:${local.ports.ssh} /v:${data.openstack_networking_floatingip_v2.public.address} /p:${random_string.winpass[0].result}"
+  windows_string     = var.is_windows ? "xfreerdp /u:admin /port:${local.ports.ssh} /v:${data.openstack_networking_floatingip_v2.public.address} /p:${random_string.winpass[0].result}" : ""
   http_string        = var.nginx_enabled ? "HTTP: http://${data.openstack_networking_floatingip_v2.public.address}:${local.ports.http}" : ""
 }
