@@ -54,3 +54,6 @@ variable "custom_secgroup_rules" {
 variable "rootdisk_size" {
   default = "default"
 }
+variable "is_windows" {
+  default = false
+}

@@ -5,7 +5,7 @@ locals {
     ssh  = jsondecode(shell_script.port_ssh.output["ports"])[0]
     http = var.nginx_enabled ? jsondecode(shell_script.port_http[0].output["ports"])[0] : null
   }
-  is_windows        = contains(["Windows10", "Windows-11"], var.image_name)
+  is_windows        = var.is_windows ? var.is_windows : contains(["Windows10", "Windows-11"], var.image_name)
   ssh_internal_port = local.is_windows ? 3389 : 22
   project_name      = var.project_name == "default" ? data.shell_script.project.output["Name"] : var.project_name
   access_key        = var.access_key == "default" ? data.shell_script.access_key.output["Name"] : var.access_key
