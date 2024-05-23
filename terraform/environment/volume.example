@@ -6,6 +6,7 @@ module "MyVM" {
   nginx_enabled = false #Webserver, set to true if you need port 80 exposed
   nfs_enabled   = false #Only set true if you requested access
   vsc_enabled   = false #Only set true if you requested access
+  is_windows = false
   volumes = {
     vol1 = {
         size = 10

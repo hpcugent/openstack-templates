@@ -55,5 +55,5 @@ variable "rootdisk_size" {
   default = "default"
 }
 variable "is_windows" {
-  default = "default"
+  type = bool
 }
