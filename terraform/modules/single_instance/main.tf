@@ -1,12 +1,21 @@
+resource "openstack_blockstorage_volume_v3" "root" {
+  name     = "${var.vm_name}-root"
+  size     = local.disk_size
+  image_id = var.image_name
+  enable_online_resize = true
+  lifecycle {
+    ignore_changes = [ image_id, source_vol_id]
+  }
+}
+
 resource "openstack_compute_instance_v2" "instance_01" {
   name        = var.vm_name
   flavor_name = var.flavor_name
   key_pair    = local.access_key
   user_data   = file("../scripts/userdata.sh")
   block_device {
-    uuid                  = data.openstack_images_image_ids_v2.image.ids[0]
-    source_type           = "image"
-    volume_size           = data.openstack_compute_flavor_v2.flavor.disk
+    uuid                  = openstack_blockstorage_volume_v3.root.id
+    source_type           = "volume"
     boot_index            = 0
     destination_type      = "volume"
     delete_on_termination = true
@@ -14,7 +23,7 @@ resource "openstack_compute_instance_v2" "instance_01" {
   metadata = {
     _SHARE_       = var.nfs_enabled ? module.linux_nfs[0].nfs_path : ""
     _ANSIBLE_URL_ = var.nginx_enabled ? var.playbook_url : ""
-    admin_pass    = local.is_windows ? random_string.winpass[0].result : "N/A"
+    admin_pass    = var.is_windows ? random_string.winpass[0].result : "N/A"
   }
   network {
     port = openstack_networking_port_v2.vm.id

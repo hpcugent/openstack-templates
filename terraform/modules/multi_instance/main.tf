@@ -9,6 +9,7 @@ module "main" {
   access_key    = var.access_key
   vsc_enabled   = var.public_vsc_enabled
   playbook_url  = var.playbook_url
+  is_windows = false
 }
 module "private" {
   count        = var.private_count
@@ -20,6 +21,7 @@ module "private" {
   project_name = var.project_name
   access_key   = var.access_key
   public       = false
+  is_windows = false
 }
 output "main" {
   value = module.main.Connections
