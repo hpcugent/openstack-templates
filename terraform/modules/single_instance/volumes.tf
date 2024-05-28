@@ -2,6 +2,7 @@ resource "openstack_blockstorage_volume_v3" "custom_volume" {
   for_each = var.volumes
   name = each.key
   size = each.value.size
+  enable_online_resize = true
 }
 
 resource "openstack_compute_volume_attach_v2" "custom_volume" {
