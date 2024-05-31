@@ -29,9 +29,6 @@ variable "project_name" {
 variable "nfs_size" {
   default = 10
 }
-variable "cloud" {
-  default = "openstack"
-}
 variable "public" {
   default = true
   type    = bool

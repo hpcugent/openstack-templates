@@ -73,7 +73,7 @@ module "linux_nfs" {
   project_name       = local.project_name
   security_group_ids = ["${openstack_networking_secgroup_v2.secgroup.id}"]
   instance_id        = openstack_compute_instance_v2.instance_01.id
-  cloud              = var.cloud
+  cloud              = local.cloud
 }
 module "linux_vsc" {
   count             = var.vsc_enabled ? 1 : 0
@@ -81,5 +81,5 @@ module "linux_vsc" {
   instance_id       = openstack_compute_instance_v2.instance_01.id
   security_group_id = openstack_networking_secgroup_v2.secgroup.id
   project_name      = local.project_name
-  cloud             = var.cloud
+  cloud             = local.cloud
 }
