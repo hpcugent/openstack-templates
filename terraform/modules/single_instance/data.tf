@@ -6,7 +6,7 @@ locals {
     http = var.nginx_enabled ? jsondecode(shell_script.port_http[0].output["ports"])[0] : null
   }
   ssh_internal_port = var.is_windows ? 3389 : 22
-  project_name      = var.project_name == "default" ? data.shell_script.project.output["Name"] : var.project_name
+  project_name      = data.openstack_identity_project_v3.project.name
   access_key        = var.access_key == "default" ? data.shell_script.access_key.output["Name"] : var.access_key
   disk_var          = var.rootdisk_size == "default" ? data.openstack_compute_flavor_v2.flavor.disk : var.rootdisk_size
   disk_size         = var.is_windows ? max(local.disk_var,60) : local.disk_var
@@ -55,15 +55,11 @@ resource "shell_script" "port_http" {
   working_directory = path.root
   interpreter       = ["/bin/bash", "-c"]
 }
-data "shell_script" "project" {
-  environment = {
-    OS_CLOUD = var.cloud
+data "openstack_identity_auth_scope_v3" "scope" {
+  name = "scope"
   }
-  lifecycle_commands {
-    read = <<EOF
-openstack project list -f json | jq '.[0]'
-    EOF
-  }
+data "openstack_identity_project_v3" "project" {
+  name = data.openstack_identity_auth_scope_v3.scope.project_name
 }
 data "shell_script" "access_key" {
   environment = {
