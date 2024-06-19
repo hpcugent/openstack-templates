@@ -24,6 +24,7 @@ locals {
     "RHEL-9.2"        = "cloud-user"
     "Ubuntu-20.04"    = "ubuntu"
     "Ubuntu-22.04"    = "ubuntu"
+    "Ubuntu-24.04"    = "ubuntu"
   }
   ssh_user           = contains(keys(local.ssh_users), var.image_name) ? local.ssh_users[var.image_name] : "root"
   private_ssh_string = "SSH: ssh -A ${local.ssh_user}@${openstack_compute_instance_v2.instance_01.network[0].fixed_ip_v4}"
