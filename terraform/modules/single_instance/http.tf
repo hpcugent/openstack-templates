@@ -13,6 +13,7 @@ resource "openstack_networking_portforwarding_v2" "http" {
       error_message = ("Cant enable forward on a private instance!")
     }
   }
+  description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http"
 }
 resource "openstack_networking_secgroup_rule_v2" "http" {
   count             = var.nginx_enabled ? 1 : 0
@@ -23,4 +24,5 @@ resource "openstack_networking_secgroup_rule_v2" "http" {
   port_range_max    = 80
   remote_ip_prefix  = "0.0.0.0/0"
   security_group_id = openstack_networking_secgroup_v2.secgroup.id
+  description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http"
 }

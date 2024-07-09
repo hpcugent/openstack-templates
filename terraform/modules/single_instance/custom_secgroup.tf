@@ -8,4 +8,5 @@ resource openstack_networking_secgroup_rule_v2 "custom" {
   port_range_max    = each.value.port
   remote_ip_prefix  = each.value.remote_ip_prefix
   security_group_id = openstack_networking_secgroup_v2.secgroup.id
+  description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-${each.key}"
 }

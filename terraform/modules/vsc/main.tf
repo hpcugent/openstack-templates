@@ -13,6 +13,8 @@ resource "openstack_networking_port_v2" "vsc" {
   fixed_ip {
     subnet_id = data.openstack_networking_subnet_ids_v2.vsc.ids[0]
   }
+  name = "${var.user_name}-${var.vm_name}-vsc"
+  tags = [ var.user_name, var.vm_name ]
 }
 
 
