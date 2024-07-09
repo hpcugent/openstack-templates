@@ -10,3 +10,9 @@ variable "project_name" {
 variable "cloud" {
 
 }
+variable "vm_name" {
+  
+}
+variable "user_name" {
+  
+}
