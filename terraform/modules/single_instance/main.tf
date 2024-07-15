@@ -18,7 +18,7 @@ resource "openstack_compute_instance_v2" "instance_01" {
     source_type           = "volume"
     boot_index            = 0
     destination_type      = "volume"
-    delete_on_termination = true
+    delete_on_termination = !var.persistent_root
   }
   metadata = {
     _SHARE_       = var.nfs_enabled ? module.linux_nfs[0].nfs_path : ""

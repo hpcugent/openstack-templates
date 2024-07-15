@@ -88,7 +88,8 @@ data "openstack_networking_network_v2" "public" {
   name = "public"
 }
 data "openstack_networking_floatingip_v2" "public" {
-  pool = data.openstack_networking_network_v2.public.id
+  address = var.floatingip_address
+  #pool = data.openstack_networking_network_v2.public.id
 }
 resource "random_string" "winpass" {
   count   = var.is_windows ? 1 : 0
