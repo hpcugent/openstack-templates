@@ -12,7 +12,7 @@ resource "openstack_compute_instance_v2" "instance_01" {
   name        = var.vm_name
   flavor_name = var.flavor_name
   key_pair    = local.access_key
-  user_data   = file("../scripts/userdata.sh")
+  user_data   = file("${local.scripts_dir}/userdata.sh")
   block_device {
     uuid                  = openstack_blockstorage_volume_v3.root.id
     source_type           = "volume"

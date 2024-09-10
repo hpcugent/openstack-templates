@@ -11,6 +11,7 @@ locals {
   access_key        = var.access_key == "default" ? data.shell_script.access_key.output["Name"] : var.access_key
   disk_var          = var.rootdisk_size == "default" ? data.openstack_compute_flavor_v2.flavor.disk : var.rootdisk_size
   disk_size         = var.is_windows ? max(local.disk_var,60) : local.disk_var
+  scripts_dir       = "${path.module}/scripts"
 }
 
 # UUID for this "instance of the module" rather than depending on a changeable instance ID
@@ -25,7 +26,7 @@ resource "shell_script" "port_ssh" {
     "OS_CLOUD"   = local.cloud
   }
   lifecycle_commands {
-    create = file("../scripts/generate_port.sh")
+    create = file("${local.scripts_dir}/generate_port.sh")
     delete = <<-EOF
       rm -rf "port_${var.vm_name}-${substr(random_uuid.uuid.result, 0, 4)}_ssh.json"
     EOF
@@ -45,7 +46,7 @@ resource "shell_script" "port_http" {
     "PORT_NAME"  = "${var.vm_name}-${substr(random_uuid.uuid.result, 0, 4)}_http"
   }
   lifecycle_commands {
-    create = file("../scripts/generate_port.sh")
+    create = file("${local.scripts_dir}/generate_port.sh")
     delete = <<-EOF
       rm -rf "port_${var.vm_name}-${substr(random_uuid.uuid.result, 0, 4)}_http.json"
     EOF
