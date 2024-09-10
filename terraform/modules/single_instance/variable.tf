@@ -54,3 +54,7 @@ variable "rootdisk_size" {
 variable "is_windows" {
   type = bool
 }
+variable "userdatafile"{
+  type = string
+  default = "default"
+}
