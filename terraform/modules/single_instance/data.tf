@@ -7,7 +7,7 @@ locals {
   }
   ssh_internal_port = var.is_windows ? 3389 : 22
   project_name      = data.openstack_identity_project_v3.project.name
-  cloud             = jsondecode(file("${path.cwd}/terraform.tfvars.json"))["cloud"]
+  cloud             = jsondecode(file("${path.root}/terraform.tfvars.json"))["cloud"]
   access_key        = var.access_key == "default" ? data.shell_script.access_key.output["Name"] : var.access_key
   disk_var          = var.rootdisk_size == "default" ? data.openstack_compute_flavor_v2.flavor.disk : var.rootdisk_size
   disk_size         = var.is_windows ? max(local.disk_var,60) : local.disk_var
