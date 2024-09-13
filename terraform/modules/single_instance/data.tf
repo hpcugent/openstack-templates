@@ -12,7 +12,7 @@ locals {
   disk_var          = var.rootdisk_size == "default" ? data.openstack_compute_flavor_v2.flavor.disk : var.rootdisk_size
   disk_size         = var.is_windows ? max(local.disk_var,60) : local.disk_var
   scripts_dir       = "${path.module}/scripts"
-  userdatafile      = var.userdatafile == "default" ? "${local.scripts_dir}/userdata.sh" : var.userdatafile
+  userdata      = var.userdata == "default" ? file("${local.scripts_dir}/userdata.sh") : var.userdata
 }
 
 # UUID for this "instance of the module" rather than depending on a changeable instance ID
