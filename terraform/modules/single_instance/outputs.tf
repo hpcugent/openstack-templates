@@ -15,7 +15,7 @@ output "Name" {
   value = openstack_compute_instance_v2.instance_01.name
 }
 output "ssh-user" {
-  value = locals.ssh_user
+  value = local.ssh_user
 }
 locals {
   ssh_users = {
