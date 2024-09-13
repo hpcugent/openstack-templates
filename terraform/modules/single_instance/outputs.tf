@@ -14,6 +14,9 @@ ${local.http_string}
 output "Name" {
   value = openstack_compute_instance_v2.instance_01.name
 }
+output "ssh-user" {
+  value = locals.ssh_user
+}
 locals {
   ssh_users = {
     "AlmaLinux-8"     = "almalinux"
