@@ -37,8 +37,18 @@ variable "public" {
 variable "volumes" {
   type = map(object({
     size = number
+    automount = optional(bool, false)
+    filesystem  = optional(string, "ext4")
   }))
   default = {}
+  validation {
+    condition = alltrue([for v in var.volumes : v.filesystem == null || contains(["ext4","ext3","ext2"],v.filesystem) ])
+    error_message = "Can only auto-create ext2,ext3,ext4!"
+  }
+  validation {
+    condition = !( anytrue([for v in var.volumes : v.automount ]) && var.is_windows )
+    error_message = "Can't automount on windows!"
+  }
 }
 variable "custom_secgroup_rules" {
   type = map(object({

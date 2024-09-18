@@ -17,6 +17,9 @@ output "Name" {
 output "ssh-user" {
   value = local.ssh_user
 }
+output "volumes" {
+  value = openstack_compute_volume_attach_v2.custom_volume
+}
 locals {
   ssh_users = {
     "AlmaLinux-8"     = "almalinux"
