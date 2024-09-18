@@ -1,6 +1,9 @@
 output "VM_ip_address" {
   value = data.openstack_networking_floatingip_v2.public.address
 }
+output "VM_private_ip" {
+  value = openstack_compute_instance_v2.instance_01.access_ip_v4
+}
 output "VM_port" {
   value = local.ports.ssh
 }
