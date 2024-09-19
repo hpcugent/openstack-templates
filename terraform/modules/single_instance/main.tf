@@ -29,6 +29,10 @@ resource "openstack_compute_instance_v2" "instance_01" {
     port = openstack_networking_port_v2.vm.id
   }
   tags = [ data.openstack_identity_auth_scope_v3.scope.user_name, var.vm_name ]
+  lifecycle {
+    # Otherwise a script update to userdata will trigger a recreate
+    ignore_changes = [ user_data ]
+  }
 }
 
 resource "openstack_networking_secgroup_v2" "secgroup" {
