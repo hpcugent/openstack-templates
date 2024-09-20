@@ -29,19 +29,17 @@ resource "terraform_data" "makeAndMount" {
   }
   provisioner "file" {
     source      = "${local.scripts_dir}/create_or_resize.sh"
-    destination = "/tmp/create_or_resize.sh"
+    destination = "/home/${local.ssh_user}/create_or_resize.sh"
   }
   provisioner "remote-exec" {
     # First do some security things, then run the script
     inline = [
-      "sudo chown root:root /tmp/create_or_resize.sh",
-      "sudo chmod o-rw /tmp/create_or_resize.sh",
-      "sudo chmod u+x /tmp/create_or_resize.sh",
-      "sudo bash /tmp/create_or_resize.sh ${each.value.device} ${each.key} ${each.value.filesystem}",
-      "sudo rm -f /tmp/create_or_resize.sh"
+      "sudo chown root:root /home/${local.ssh_user}/create_or_resize.sh",
+      "sudo chmod 770 /home/${local.ssh_user}/create_or_resize.sh",
+      "sudo bash /home/${local.ssh_user}/create_or_resize.sh ${each.value.device} ${each.key} ${each.value.filesystem}",
+      "sudo rm -f /home/${local.ssh_user}/create_or_resize.sh"
     ]
   }
-
 }
 # Runs on destroy to unmount the volume when it is removed from the configuration
 resource "null_resource" "unmount" {
