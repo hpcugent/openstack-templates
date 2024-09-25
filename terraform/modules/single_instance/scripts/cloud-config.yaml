@@ -1,9 +1,9 @@
-## template: jinja
 #cloud-config
 packages:
   - curl
   - jq
   - ansible-core
+
 write_files:
 # create-or-resize
 - encoding: b64
@@ -11,6 +11,15 @@ write_files:
   owner: root:root
   path: /opt/vsc/scripts/create_or_resize.sh
   permissions: '0770'
-
+%{ for file in files }
+- encoding: b64
+  content: ${ file.content_base64 }
+  owner: root:root
+  path: /opt/vsc/ansible/${basename(file.filename)}
+  permissions: '0770'
+%{ endfor }
 runcmd:
-- [mkdir /opt/vsc/cron]
+- [mkdir,-p,/opt/vsc/cron]
+- [mkdir,-p,/opt/vsc/ansible/]
+- ["ansible-galaxy", "collection", "install", "ansible.posix"]
+- ["ansible-galaxy", "collection", "install", "community.general"]

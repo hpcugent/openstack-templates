@@ -1,0 +1,11 @@
+- name: Configure NFS mount
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: NFS
+    ansible.posix.mount:
+      path: /mnt/nfs
+      src: "{{ nfs_path }}"
+      fstype: nfs
+      opts: defaults,_netdev
+      state: "{{ 'mounted' if mount == 'true' else 'absent' }}"
