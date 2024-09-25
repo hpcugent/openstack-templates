@@ -1,0 +1,16 @@
+## template: jinja
+#cloud-config
+packages:
+  - curl
+  - jq
+  - ansible-core
+write_files:
+# create-or-resize
+- encoding: b64
+  content: ${ base64encode(resizescript) }
+  owner: root:root
+  path: /opt/vsc/scripts/create_or_resize.sh
+  permissions: '0770'
+
+runcmd:
+- [mkdir /opt/vsc/cron]

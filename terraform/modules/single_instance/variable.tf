@@ -64,7 +64,14 @@ variable "rootdisk_size" {
 variable "is_windows" {
   type = bool
 }
-variable "userdata"{
+variable "userscript"{
   type = string
-  default = "default"
+  default = ""
+}
+variable "cloudinit" {
+  type = map(object({
+    content_type = string
+    content = string
+  }))
+  default = {}
 }

@@ -37,8 +37,6 @@ resource "null_resource" "cron" {
   }
   provisioner "remote-exec" {
     inline = [
-      "sudo mkdir -p /opt/vsc/cron",
-      "sudo chown root:root /opt/vsc/cron",
       "sudo cp /home/${local.ssh_user}/${random_id.obscure[each.key].id}-${each.key}.sh /opt/vsc/cron/${each.key}.sh",
       "sudo chmod +x /opt/vsc/cron/${each.key}.sh"
      ]

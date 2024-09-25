@@ -27,17 +27,10 @@ resource "terraform_data" "makeAndMount" {
     timeout = "5m"
     port = local.ports.ssh
   }
-  provisioner "file" {
-    source      = "${local.scripts_dir}/create_or_resize.sh"
-    destination = "/home/${local.ssh_user}/create_or_resize.sh"
-  }
   provisioner "remote-exec" {
     # First do some security things, then run the script
     inline = [
-      "sudo chown root:root /home/${local.ssh_user}/create_or_resize.sh",
-      "sudo chmod 770 /home/${local.ssh_user}/create_or_resize.sh",
-      "sudo bash /home/${local.ssh_user}/create_or_resize.sh ${each.value.device} ${each.key} ${each.value.filesystem}",
-      "sudo rm -f /home/${local.ssh_user}/create_or_resize.sh"
+      "sudo bash /opt/vsc/scripts/create_or_resize.sh ${each.value.device} ${each.key} ${each.value.filesystem}",
     ]
   }
 }
