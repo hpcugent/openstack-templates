@@ -11,58 +11,47 @@ resource "openstack_compute_volume_attach_v2" "custom_volume" {
   instance_id = openstack_compute_instance_v2.instance_01.id
   volume_id   = each.value.id
 }
-# Mount all automount volumes and create the filesystem
-resource "terraform_data" "makeAndMount" {
+resource "null_resource" "volumes" {
   for_each = {
     for k, v in openstack_compute_volume_attach_v2.custom_volume : k => merge(v,{filesystem = var.volumes[k].filesystem,size = var.volumes[k].size})
     if var.volumes[k].automount == true && var.is_windows == false
   }
-  depends_on = [ openstack_compute_volume_attach_v2.custom_volume, openstack_compute_instance_v2.instance_01 ]
-  triggers_replace = each.value.size
-  connection {
-    type     = "ssh"
-    user     = local.ssh_user
-    agent = true
-    host     = data.openstack_networking_floatingip_v2.public.address
-    timeout = "5m"
-    port = local.ports.ssh
-  }
-  provisioner "remote-exec" {
-    # First do some security things, then run the script
-    inline = [
-      "sudo bash /opt/vsc/scripts/create_or_resize.sh ${each.value.device} ${each.key} ${each.value.filesystem}",
-    ]
-  }
-}
-# Runs on destroy to unmount the volume when it is removed from the configuration
-resource "null_resource" "unmount" {
-  for_each = {
-    for k, v in openstack_compute_volume_attach_v2.custom_volume : k => merge(v,{filesystem = var.volumes[k].filesystem,size = var.volumes[k].size})
-    if var.volumes[k].automount == true && var.is_windows == false
-  }
-  depends_on = [ openstack_compute_volume_attach_v2.custom_volume, openstack_compute_instance_v2.instance_01 ]
-  # Necessary because of some "dependency loop" prevention in terraform.
   triggers = {
     user = local.ssh_user
     port = local.ports.ssh
     ip = data.openstack_networking_floatingip_v2.public.address
-    volume = each.key
+    name = each.key
+    filesystem = each.value.filesystem
+    device = each.value.device
   }
+  depends_on = [ terraform_data.filesystem ]
   connection {
-    type     = "ssh"
     user     = self.triggers.user
-    agent = true
     host     = self.triggers.ip
-    timeout = "5m"
     port = self.triggers.port
   }
   provisioner "remote-exec" {
-    when        = destroy
-    on_failure  = continue
-    inline = [
-      "sudo umount /mnt/${each.key}",
-      "sudo rm -rf /mnt/${each.key}"
-    ]
+    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_vol.yaml -e \"mount=true vol_name=${self.triggers.name} filesystem=${self.triggers.filesystem} device=${self.triggers.device}\"" ]
+  }
+  provisioner "remote-exec" {
+    when = destroy
+    on_failure = continue
+    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_vol.yaml -e \"mount=false vol_name=${self.triggers.name} filesystem=${self.triggers.filesystem} device=${self.triggers.device}\"" ]
   }
 }
-
+resource "terraform_data" "filesystem" {
+  for_each = {
+    for k, v in openstack_compute_volume_attach_v2.custom_volume : k => merge(v,{filesystem = var.volumes[k].filesystem,size = var.volumes[k].size})
+    if var.volumes[k].automount == true && var.is_windows == false
+  }
+  triggers_replace = [each.value.size]
+  depends_on = [ time_sleep.waitforinstall ]
+  connection {
+    user     = local.ssh_user
+    host     = data.openstack_networking_floatingip_v2.public.address
+    port = local.ports.ssh
+  }
+  provisioner "remote-exec" {
+    inline = [ "sudo ansible-playbook /opt/vsc/ansible/create_or_resize.yaml -e \"filesystem=${each.value.filesystem} device=${each.value.device}\"" ]
+  }
+}

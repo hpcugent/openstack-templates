@@ -5,12 +5,6 @@ packages:
   - ansible-core
 
 write_files:
-# create-or-resize
-- encoding: b64
-  content: ${ base64encode(resizescript) }
-  owner: root:root
-  path: /opt/vsc/scripts/create_or_resize.sh
-  permissions: '0770'
 %{ for file in files }
 - encoding: b64
   content: ${ file.content_base64 }
@@ -18,6 +12,14 @@ write_files:
   path: /opt/vsc/ansible/${basename(file.filename)}
   permissions: '0770'
 %{ endfor }
+- content: |
+    [defaults]
+    localhost_warning=False
+    collections_on_ansible_version_mismatch=ignore
+
+    [inventory]
+    inventory_unparsed_warning=False
+  path: /etc/ansible/ansible.cfg
 runcmd:
 - [mkdir,-p,/opt/vsc/cron]
 - [mkdir,-p,/opt/vsc/ansible/]

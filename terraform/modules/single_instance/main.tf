@@ -21,8 +21,6 @@ resource "openstack_compute_instance_v2" "instance_01" {
     delete_on_termination = true
   }
   metadata = {
-    _SHARE_       = var.nfs_enabled ? module.linux_nfs[0].nfs_path : ""
-    _ANSIBLE_URL_ = var.nginx_enabled ? var.playbook_url : ""
     admin_pass    = var.is_windows ? random_string.winpass[0].result : "N/A"
   }
   network {

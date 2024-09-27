@@ -5,7 +5,7 @@ data "cloudinit_config" "main" {
     filename     = "cloud-config.yaml"
     content_type = "text/cloud-config"
 
-    content = templatefile("${local.scripts_dir}/cloud-config.yaml", { resizescript = file("${local.scripts_dir}/create_or_resize.sh"), files = data.local_file.ansible })
+    content = templatefile("${local.scripts_dir}/cloud-config.yaml", { files = data.local_file.ansible })
   }
   part {
     filename     = "userscript.sh"
@@ -76,6 +76,7 @@ resource "null_resource" "nfs" {
   }
     provisioner "remote-exec" {
     when = destroy
+    on_failure = continue
     inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_nfs.yaml -e \"mount=false nfs_path=${self.triggers.path}\"" ]
   }
 }
