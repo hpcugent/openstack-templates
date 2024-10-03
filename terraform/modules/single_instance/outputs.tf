@@ -11,8 +11,12 @@ output "Connections" {
   value = trimspace(<<Connections
 ${var.is_windows ? local.windows_string : local.ssh_string}
 ${local.http_string}
+${length(openstack_networking_portforwarding_v2.custom) > 0 ? local.custom_ports : ""}
   Connections
   )
+}
+output "ports" {
+  value = local.custom_ports
 }
 output "Name" {
   value = openstack_compute_instance_v2.instance_01.name

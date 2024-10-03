@@ -55,6 +55,7 @@ variable "custom_secgroup_rules" {
     port = number
     remote_ip_prefix = string
     protocol = string
+    expose = optional(bool,false)
   }))
   default = {}
 }
