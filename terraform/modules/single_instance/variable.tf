@@ -20,9 +20,6 @@ variable "vsc_enabled" {
   default = false
   type    = bool
 }
-variable "playbook_url" {
-  default = "https://raw.githubusercontent.com/hpcugent/openstack-templates/master/heat/playbooks/install_nginx.yaml"
-}
 variable "project_name" {
   default = "default"
 }
@@ -68,6 +65,7 @@ variable "is_windows" {
 variable "userscript"{
   type = string
   default = ""
+  description = "A shell script that is executed when the instance is created."
 }
 variable "cloudinit" {
   type = map(object({
@@ -75,4 +73,5 @@ variable "cloudinit" {
     content = string
   }))
   default = {}
+  description = "A cloud-init part, see https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config"
 }
