@@ -23,5 +23,6 @@ write_files:
 runcmd:
 - [mkdir,-p,/opt/vsc/cron]
 - [mkdir,-p,/opt/vsc/ansible/]
+- [mkdir,-p,/opt/vsc/cron/]
 - ["ansible-galaxy", "collection", "install", "ansible.posix"]
 - ["ansible-galaxy", "collection", "install", "community.general"]

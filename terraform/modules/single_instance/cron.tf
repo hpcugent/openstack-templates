@@ -9,7 +9,7 @@ variable "crontabs" {
 
 resource "null_resource" "cron" {
   for_each = local.crons
-  depends_on = [ openstack_compute_instance_v2.instance_01 ]
+  depends_on = [ time_sleep.waitforinstall ]
   triggers = {
     user = local.ssh_user
     port = local.ports.ssh
@@ -37,12 +37,9 @@ resource "null_resource" "cron" {
   }
   provisioner "remote-exec" {
     inline = [
+      "set -e",
       "sudo cp /home/${local.ssh_user}/${random_id.obscure[each.key].id}-${each.key}.sh /opt/vsc/cron/${each.key}.sh",
-      "sudo chmod +x /opt/vsc/cron/${each.key}.sh"
-     ]
-  }
-  provisioner "remote-exec" {
-    inline = [ 
+      "sudo chmod +x /opt/vsc/cron/${each.key}.sh",
       "sudo mv /home/${local.ssh_user}/${random_id.obscure[each.key].id}-${each.key}.cron /etc/cron.d/${each.key}",
       "sudo chown root:root /etc/cron.d/${each.key}",
       "sudo restorecon /etc/cron.d/${each.key} || echo \"SELinux not installed?\""
