@@ -1,0 +1,11 @@
+- name: "Mount {{vol_name}}"
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Mount
+    ansible.posix.mount:
+      path: "/mnt/{{vol_name}}"
+      src: "{{ device }}"
+      fstype: "{{ filesystem }}"
+      opts: defaults
+      state: "{{ 'mounted' if mount == 'true' else 'absent' }}"

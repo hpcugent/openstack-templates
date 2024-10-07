@@ -12,7 +12,7 @@ resource "openstack_compute_instance_v2" "instance_01" {
   name        = var.vm_name
   flavor_name = var.flavor_name
   key_pair    = local.access_key
-  user_data   = file("../scripts/userdata.sh")
+  user_data   = data.cloudinit_config.main.rendered
   block_device {
     uuid                  = openstack_blockstorage_volume_v3.root.id
     source_type           = "volume"
@@ -21,14 +21,16 @@ resource "openstack_compute_instance_v2" "instance_01" {
     delete_on_termination = true
   }
   metadata = {
-    _SHARE_       = var.nfs_enabled ? module.linux_nfs[0].nfs_path : ""
-    _ANSIBLE_URL_ = var.nginx_enabled ? var.playbook_url : ""
     admin_pass    = var.is_windows ? random_string.winpass[0].result : "N/A"
   }
   network {
     port = openstack_networking_port_v2.vm.id
   }
   tags = [ data.openstack_identity_auth_scope_v3.scope.user_name, var.vm_name ]
+  lifecycle {
+    # Otherwise a script update to userdata will trigger a recreate
+    ignore_changes = [ user_data ]
+  }
 }
 
 resource "openstack_networking_secgroup_v2" "secgroup" {

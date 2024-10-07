@@ -22,7 +22,7 @@ resource "shell_script" "custom_portforward" {
     "OS_CLOUD"   = local.cloud
   }
   lifecycle_commands {
-    create = file("../scripts/generate_port.sh")
+    create = file("${local.scripts_dir}/generate_port.sh")
     delete = <<-EOF
       rm -rf "port_${var.vm_name}-${substr(random_uuid.uuid.result, 0, 4)}_${each.key}.json"
     EOF

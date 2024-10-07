@@ -1,6 +1,9 @@
 output "VM_ip_address" {
   value = data.openstack_networking_floatingip_v2.public.address
 }
+output "VM_private_ip" {
+  value = openstack_compute_instance_v2.instance_01.access_ip_v4
+}
 output "VM_port" {
   value = local.ports.ssh
 }
@@ -17,6 +20,12 @@ output "ports" {
 }
 output "Name" {
   value = openstack_compute_instance_v2.instance_01.name
+}
+output "ssh-user" {
+  value = local.ssh_user
+}
+output "volumes" {
+  value = openstack_compute_volume_attach_v2.custom_volume
 }
 locals {
   ssh_users = {
