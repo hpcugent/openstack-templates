@@ -12,6 +12,7 @@ resource "openstack_networking_portforwarding_v2" "http" {
       condition     = var.public
       error_message = ("Cant enable forward on a private instance!")
     }
+    replace_triggered_by = [ shell_script.port_http ]
   }
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http-80"
 }
@@ -29,6 +30,7 @@ resource "openstack_networking_portforwarding_v2" "https" {
       condition     = var.public
       error_message = ("Cant enable forward on a private instance!")
     }
+    replace_triggered_by = [ shell_script.port_http ]
   }
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http-443"
 }
