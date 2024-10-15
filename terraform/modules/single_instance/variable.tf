@@ -71,3 +71,19 @@ variable "cloudinit" {
   default = {}
   description = "A cloud-init part, see https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config"
 }
+variable "http_port" {
+  type = number
+  default = 80
+  validation {
+    condition = var.http_port == 80 || var.http_port >= 50000 && var.http_port <= 60000
+    error_message = "Custom port should be between 50000 and 60000!"
+  }
+}
+variable "https_port" {
+  type = number
+  default = 443
+  validation {
+    condition = var.https_port == 443 || var.https_port >= 50000 && var.https_port <= 60000
+    error_message = "Custom port should be between 50000 and 60000!"
+  }
+}
