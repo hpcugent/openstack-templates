@@ -1,7 +1,7 @@
 resource "openstack_networking_portforwarding_v2" "http" {
   count               = var.nginx_enabled ? 1 : 0
   floatingip_id       = data.openstack_networking_floatingip_v2.public.id
-  external_port       = var.http_port
+  external_port       = local.ports.http
   internal_port       = 80
   internal_port_id    = openstack_networking_port_v2.vm.id
   internal_ip_address = openstack_networking_port_v2.vm.all_fixed_ips[0]
@@ -18,7 +18,7 @@ resource "openstack_networking_portforwarding_v2" "http" {
 resource "openstack_networking_portforwarding_v2" "https" {
   count               = var.nginx_enabled ? 1 : 0
   floatingip_id       = data.openstack_networking_floatingip_v2.public.id
-  external_port       = var.https_port
+  external_port       = local.ports.https
   internal_port       = 443
   internal_port_id    = openstack_networking_port_v2.vm.id
   internal_ip_address = openstack_networking_port_v2.vm.all_fixed_ips[0]

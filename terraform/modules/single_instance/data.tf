@@ -3,7 +3,8 @@ locals {
   any_enabled  = var.nfs_enabled || var.nginx_enabled
   ports = {
     ssh  = jsondecode(shell_script.port_ssh.output["ports"])[0]
-    http = var.nginx_enabled ? jsondecode(shell_script.port_http[0].output["ports"])[0] : null
+    http = var.nginx_enabled ? ( var.alt_http ? jsondecode(shell_script.port_http[0].output["ports"])[0] : 80 ) : null
+    https = var.nginx_enabled ? ( var.alt_http ? jsondecode(shell_script.port_http[0].output["ports"])[1] : 443) : null
   }
   ssh_internal_port = var.is_windows ? 3389 : 22
   project_name      = data.openstack_identity_project_v3.project.name
@@ -38,11 +39,11 @@ resource "shell_script" "port_ssh" {
   interpreter       = ["/bin/bash", "-c"]
 }
 resource "shell_script" "port_http" {
-  count = var.nginx_enabled ? 1 : 0
+  count = var.nginx_enabled && var.alt_http ? 1 : 0
   environment = {
     "OS_CLOUD"   = local.cloud
     "IP_ID"      = data.openstack_networking_floatingip_v2.public.id
-    "PORT_COUNT" = 1
+    "PORT_COUNT" = 2
     "PORT_NAME"  = "${var.vm_name}-${substr(random_uuid.uuid.result, 0, 4)}_http"
   }
   lifecycle_commands {
