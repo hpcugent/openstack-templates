@@ -75,6 +75,7 @@ resource "openstack_networking_portforwarding_v2" "ssh" {
 ## NFS
 module "linux_nfs" {
   count              = var.nfs_enabled ? 1 : 0
+  depends_on = [ null_resource.testconnection ]
   source             = "../nfs"
   share_name         = "${local.project_name}_share"
   share_size         = var.nfs_size
@@ -84,6 +85,12 @@ module "linux_nfs" {
   cloud              = local.cloud
   vm_name            = var.vm_name
   user_name          = data.openstack_identity_auth_scope_v3.scope.user_name
+  host = {
+    ip = data.openstack_networking_floatingip_v2.public.address
+    port = local.ports.ssh
+    user = local.ssh_user
+    is_windows = var.is_windows
+  }
 }
 module "linux_vsc" {
   count             = var.vsc_enabled ? 1 : 0

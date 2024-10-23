@@ -1,7 +1,9 @@
 - name: Configure NFS mount
-  connection: local
-  hosts: localhost
+  hosts: all
   tasks:
+  - name: invoke dhclient
+    ansible.builtin.command: dhclient
+    when: ansible_distribution|lower == "ubuntu" or ansible_distribution|lower == "debian"
   - name: NFS
     ansible.posix.mount:
       path: /mnt/nfs
@@ -9,3 +11,5 @@
       fstype: nfs
       opts: defaults,_netdev
       state: "{{ 'mounted' if mount == 'true' else 'absent' }}"
+  become: true
+  timeout: 120

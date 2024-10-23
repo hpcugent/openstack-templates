@@ -9,7 +9,7 @@ variable "crontabs" {
 
 resource "null_resource" "cron" {
   for_each = local.crons
-  depends_on = [ time_sleep.waitforinstall ]
+  depends_on = [ null_resource.testconnection ]
   triggers = {
     user = local.ssh_user
     port = local.ports.ssh

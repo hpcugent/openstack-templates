@@ -1,6 +1,5 @@
 - name: "Mount {{vol_name}}"
-  connection: local
-  hosts: localhost
+  hosts: all
   tasks:
   - name: Mount
     ansible.posix.mount:
@@ -9,3 +8,5 @@
       fstype: "{{ filesystem }}"
       opts: defaults
       state: "{{ 'mounted' if mount == 'true' else 'absent' }}"
+    become: true
+    timeout: 60

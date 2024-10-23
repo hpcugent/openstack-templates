@@ -12,5 +12,9 @@ terraform {
       source  = "scottwinkler/shell"
       version = "1.7.10"
     }
+    ansible = {
+      source = "ansible/ansible"
+      version = "1.3.0"
+    }
   }
 }

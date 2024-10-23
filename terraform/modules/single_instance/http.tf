@@ -6,15 +6,19 @@ resource "openstack_networking_portforwarding_v2" "http" {
   internal_port_id    = openstack_networking_port_v2.vm.id
   internal_ip_address = openstack_networking_port_v2.vm.all_fixed_ips[0]
   protocol            = "tcp"
-  depends_on          = [openstack_networking_secgroup_rule_v2.http]
+  depends_on          = [openstack_networking_secgroup_rule_v2.http, shell_script.port_http]
   lifecycle {
     precondition {
       condition     = var.public
       error_message = ("Cant enable forward on a private instance!")
     }
-    replace_triggered_by = [ shell_script.port_http ]
+    replace_triggered_by = [terraform_data.http_port.output]
   }
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http-80"
+}
+resource terraform_data http_port {
+  # stupid work around for terraform being unable to cope with optional replaced_triggered_by
+  input = try(shell_script.port_http[0].output,local.ports.http)
 }
 resource "openstack_networking_portforwarding_v2" "https" {
   count               = var.nginx_enabled ? 1 : 0
@@ -30,7 +34,7 @@ resource "openstack_networking_portforwarding_v2" "https" {
       condition     = var.public
       error_message = ("Cant enable forward on a private instance!")
     }
-    replace_triggered_by = [ shell_script.port_http ]
+    replace_triggered_by = [terraform_data.http_port.output]
   }
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http-443"
 }

@@ -29,56 +29,41 @@ data "local_file" "ansible" {
   filename = "${local.scripts_dir}/ansible/${each.value}"
 }
 
-resource "time_sleep" "waitforinstall" {
+resource "null_resource" "testconnection" {
+  count = var.is_windows ? 0 : 1
   depends_on = [ openstack_compute_instance_v2.instance_01 ]
-  create_duration = "2m"
+  triggers = {
+    user = local.ssh_user
+    port = local.ports.ssh
+    ip = data.openstack_networking_floatingip_v2.public.address
+  }
+  provisioner "remote-exec" {
+    connection {
+      user     = self.triggers.user
+      host     = self.triggers.ip
+      port = self.triggers.port
+      timeout = "5m"
+    }
+    inline = ["echo 'connected!'"]
+  }
 }
-
 resource "null_resource" "nginx" {
-  count = var.nginx_enabled ? 1 : 0
+  count = ( var.nginx_enabled && !var.is_windows) ? 1 : 0
   triggers = {
     enabled = var.nginx_enabled
-    user = local.ssh_user
-    port = local.ports.ssh
-    ip = data.openstack_networking_floatingip_v2.public.address
+    scripts_dir = local.scripts_dir
+    ansible_command = local.ansible_command
+    environment = jsonencode(local.ansible_env)
   }
-  depends_on = [ time_sleep.waitforinstall ]
-  connection {
-    user     = self.triggers.user
-    host     = self.triggers.ip
-    port = self.triggers.port
-    timeout = "2m"
+  depends_on = [ null_resource.testconnection ]
+  provisioner "local-exec" {
+    environment = jsondecode(self.triggers.environment)
+    command = "${self.triggers.ansible_command} ${self.triggers.scripts_dir}/ansible/nginx.yaml --extra-vars install=${self.triggers.enabled}"
   }
-  provisioner "remote-exec" {
-    inline = [ "sudo ansible-playbook /opt/vsc/ansible/nginx.yaml --extra-vars install=${self.triggers.enabled}" ]
-  }
-  provisioner "remote-exec" {
+  provisioner "local-exec" {
+    environment = jsondecode(self.triggers.environment)
     when = destroy
     on_failure = continue
-    inline = [ "sudo ansible-playbook /opt/vsc/ansible/nginx.yaml --extra-vars install=false" ]
-  }
-}
-resource "null_resource" "nfs" {
-  count = var.nfs_enabled ? 1 : 0
-  triggers = {
-    enabled = var.nfs_enabled
-    path    = module.linux_nfs[0].nfs_path
-    user = local.ssh_user
-    port = local.ports.ssh
-    ip = data.openstack_networking_floatingip_v2.public.address
-  }
-  depends_on = [ module.linux_nfs[0] ,time_sleep.waitforinstall ]
-  connection {
-    user     = self.triggers.user
-    host     = self.triggers.ip
-    port = self.triggers.port
-  }
-  provisioner "remote-exec" {
-    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_nfs.yaml -e \"mount=${self.triggers.enabled} nfs_path=${self.triggers.path}\"" ]
-  }
-    provisioner "remote-exec" {
-    when = destroy
-    on_failure = continue
-    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_nfs.yaml -e \"mount=false nfs_path=${self.triggers.path}\"" ]
+    command=  "${self.triggers.ansible_command} ${self.triggers.scripts_dir}/ansible/nginx.yaml --extra-vars install=false"
   }
 }
