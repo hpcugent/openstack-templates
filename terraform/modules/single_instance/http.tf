@@ -60,3 +60,23 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
   security_group_id = openstack_networking_secgroup_v2.secgroup.id
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http"
 }
+resource "null_resource" "nginx" {
+  count = ( var.nginx_enabled && !var.is_windows) ? 1 : 0
+  triggers = {
+    enabled = var.nginx_enabled
+    scripts_dir = local.scripts_dir
+    ansible_command = local.ansible_command
+    environment = jsonencode(local.ansible_env)
+  }
+  depends_on = [ null_resource.testconnection ]
+  provisioner "local-exec" {
+    environment = jsondecode(self.triggers.environment)
+    command = "${self.triggers.ansible_command} ${self.triggers.scripts_dir}/ansible/nginx.yaml --extra-vars install=${self.triggers.enabled}"
+  }
+  provisioner "local-exec" {
+    environment = jsondecode(self.triggers.environment)
+    when = destroy
+    on_failure = continue
+    command=  "${self.triggers.ansible_command} ${self.triggers.scripts_dir}/ansible/nginx.yaml --extra-vars install=false"
+  }
+}
