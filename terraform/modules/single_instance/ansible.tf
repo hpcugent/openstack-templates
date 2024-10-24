@@ -7,7 +7,7 @@ locals {
   ansible_command="timeout 4m ansible-playbook -c ssh -i ${data.openstack_networking_floatingip_v2.public.address},"
 }
 resource "null_resource" "testconnection" {
-  count = var.scripts_enabled ? 1 : 0
+  count = local.scripts_enabled ? 1 : 0
   depends_on = [ openstack_compute_instance_v2.instance_01 ]
   triggers = {
     user = local.ssh_user
@@ -25,5 +25,5 @@ resource "null_resource" "testconnection" {
   }
 }
 locals {
-  scripts_enabled = var.is_windows ? var.is_windows : var.scripts_enabled
+  scripts_enabled = var.is_windows ? false : var.scripts_enabled
 }

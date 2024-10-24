@@ -5,6 +5,10 @@ variable "crontabs" {
     script = string 
   }))
   default = {}
+  validation {
+    condition = !( length(var.crontabs) > 0 && var.is_windows )
+    error_message = "Can't add crons to windows!"
+  }
 }
 
 resource "null_resource" "cron" {
