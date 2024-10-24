@@ -7,7 +7,7 @@ locals {
   ansible_command="timeout 4m ansible-playbook -c ssh -i ${data.openstack_networking_floatingip_v2.public.address},"
 }
 resource "null_resource" "testconnection" {
-  count = var.is_windows ? 0 : 1
+  count = var.scripts_enabled ? 1 : 0
   depends_on = [ openstack_compute_instance_v2.instance_01 ]
   triggers = {
     user = local.ssh_user
@@ -21,6 +21,9 @@ resource "null_resource" "testconnection" {
       port = self.triggers.port
       timeout = "5m"
     }
-    inline = ["echo 'connected!'"]
+    inline = [ "until [ \"$(cloud-init status)\" = 'status: done' ] ;do sleep 5;done" ]
   }
+}
+locals {
+  scripts_enabled = var.is_windows ? var.is_windows : var.scripts_enabled
 }

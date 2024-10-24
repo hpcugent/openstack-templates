@@ -89,7 +89,7 @@ module "linux_nfs" {
     ip = data.openstack_networking_floatingip_v2.public.address
     port = local.ports.ssh
     user = local.ssh_user
-    is_windows = var.is_windows
+    scripts_enabled = local.scripts_enabled
   }
 }
 module "linux_vsc" {

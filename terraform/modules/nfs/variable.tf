@@ -23,6 +23,6 @@ variable "host" {
     ip = string
     port = string
     user = string
-    is_windows = bool
+    scripts_enabled = bool
   })
 }

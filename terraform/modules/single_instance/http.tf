@@ -61,7 +61,7 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http"
 }
 resource "null_resource" "nginx" {
-  count = ( var.nginx_enabled && !var.is_windows) ? 1 : 0
+  count = ( var.nginx_enabled && local.scripts_enabled ) ? 1 : 0
   triggers = {
     enabled = var.nginx_enabled
     scripts_dir = local.scripts_dir

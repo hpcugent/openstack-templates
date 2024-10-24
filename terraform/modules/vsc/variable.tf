@@ -16,3 +16,4 @@ variable "vm_name" {
 variable "user_name" {
   
 }
+

@@ -29,7 +29,7 @@ resource "openstack_sharedfilesystem_share_access_v2" "share_01_access" {
   access_level = "rw"
 }
 resource "null_resource" "nfs" {
-  count = var.host.is_windows ? 0 : 1
+  count = var.host.scripts_enabled ? 1 : 0
   triggers = {
     path = openstack_sharedfilesystem_share_v2.share_01.export_locations[0].path
     ansible_command = local.ansible_command

@@ -8,7 +8,10 @@ variable "crontabs" {
 }
 
 resource "null_resource" "cron" {
-  for_each = local.crons
+  for_each = {
+    for k,v in local.crons : k => v
+    if local.scripts_enabled
+  }
   depends_on = [ null_resource.testconnection ]
   triggers = {
     user = local.ssh_user

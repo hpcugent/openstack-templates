@@ -14,7 +14,7 @@ resource "openstack_compute_volume_attach_v2" "custom_volume" {
 resource "null_resource" "filesystem" {
   for_each = {
     for k, v in openstack_compute_volume_attach_v2.custom_volume : k => merge(v, { filesystem = var.volumes[k].filesystem, size = var.volumes[k].size, automount = var.volumes[k].automount })
-    if var.volumes[k].automount && var.is_windows == false
+    if var.volumes[k].automount && local.scripts_enabled
   }
   triggers = {
     filesystem = each.value.filesystem
@@ -34,7 +34,7 @@ resource "null_resource" "filesystem" {
 resource "null_resource" "volumeMount" {
   for_each = {
     for k, v in openstack_compute_volume_attach_v2.custom_volume : k => merge(v, { filesystem = var.volumes[k].filesystem, size = var.volumes[k].size, automount = var.volumes[k].automount })
-    if var.volumes[k].automount && var.is_windows == false
+    if var.volumes[k].automount && local.scripts_enabled
   }
   triggers = {
     name = each.key

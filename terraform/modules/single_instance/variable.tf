@@ -60,7 +60,10 @@ variable "is_windows" {
 }
 variable "userscript"{
   type = string
-  default = ""
+  default = <<-EOF
+  #!/bin/sh
+  return 0
+  EOF 
   description = "A shell script that is executed when the instance is created."
 }
 variable "cloudinit" {
@@ -75,4 +78,9 @@ variable "alt_http" {
   type = bool
   default = false
   description = "select a random port for http"
+}
+variable "scripts_enabled" {
+  type = bool
+  default = true
+  description = "Enables or disables local ansible scripts"
 }
