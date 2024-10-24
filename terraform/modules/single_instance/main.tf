@@ -94,6 +94,7 @@ module "linux_nfs" {
 }
 module "linux_vsc" {
   count             = var.vsc_enabled ? 1 : 0
+  depends_on = [ null_resource.testconnection ]
   source            = "../vsc"
   instance_id       = openstack_compute_instance_v2.instance_01.id
   security_group_id = openstack_networking_secgroup_v2.secgroup.id
@@ -101,4 +102,10 @@ module "linux_vsc" {
   cloud             = local.cloud
   vm_name           = var.vm_name
   user_name         = data.openstack_identity_auth_scope_v3.scope.user_name
+  host = {
+    ip = data.openstack_networking_floatingip_v2.public.address
+    port = local.ports.ssh
+    user = local.ssh_user
+    scripts_enabled = local.scripts_enabled
+  }
 }

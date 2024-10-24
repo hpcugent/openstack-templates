@@ -23,3 +23,19 @@ resource "openstack_compute_interface_attach_v2" "vsc_attach" {
   instance_id = var.instance_id
   port_id     = openstack_networking_port_v2.vsc.id
 }
+resource "null_resource" "fix_dhcp" {
+  depends_on = [ openstack_compute_interface_attach_v2.vsc_attach ]
+  count = var.host.scripts_enabled ? 1 : 0
+  connection {
+    type     = "ssh"
+    user     = var.host.user
+    agent = true
+    host     = var.host.ip
+    timeout = "5m"
+    port = var.host.port
+  }
+  provisioner "remote-exec" {
+    inline = [ "sudo dhclient" ]
+    on_failure = continue
+  }
+}
