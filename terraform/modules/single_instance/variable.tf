@@ -62,7 +62,7 @@ variable "userscript"{
   type = string
   default = <<-EOF
   #!/bin/sh
-  return 0
+  exit 0
   EOF 
   description = "A shell script that is executed when the instance is created."
 }

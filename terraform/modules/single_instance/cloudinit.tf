@@ -11,6 +11,14 @@ data "cloudinit_config" "main" {
     content_type = "text/x-shellscript"
     content = var.userscript
   }
+  part {
+    filename = "install_common.sh"
+    content_type = "test/x-shellscript"
+    content = <<-EOF
+    #!/bin/bash
+    [[ -r '/etc/debian_version' ]] && apt-get update && apt-get install -y nfs-common cron dhcp-client
+    EOF
+  }
   dynamic "part" {
     for_each = var.cloudinit
     content {

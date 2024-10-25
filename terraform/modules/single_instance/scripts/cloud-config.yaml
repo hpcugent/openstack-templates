@@ -1,8 +1,3 @@
 #cloud-config
-packages:
-  - curl
-  - jq
-  - nfs-common
-  - cron #not installed in debian 12, apparently
 runcmd:
 - [mkdir,-p,/opt/vsc/cron]
