@@ -16,7 +16,9 @@ data "cloudinit_config" "main" {
     content_type = "text/x-shellscript"
     content = <<-EOF
     #!/bin/bash
-    [[ -r '/etc/debian_version' ]] && apt-get update && apt-get install -y nfs-common cron
+    if [[ -r '/etc/debian_version' ]];then 
+      apt-get update && apt-get install -y nfs-common cron
+    fi
     EOF
   }
   dynamic "part" {
