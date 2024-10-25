@@ -1,7 +1,0 @@
-- name: Fix dhcp
-  hosts: all
-  tasks:
-  - name: invoke dhcpd
-    ansible.builtin.command: dhcpcd
-    when: ansible_distribution|lower == "ubuntu" or ansible_distribution|lower == "debian"
-  become: true

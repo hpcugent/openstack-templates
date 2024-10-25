@@ -1,9 +1,6 @@
 - name: Configure NFS mount
   hosts: all
   tasks:
-  - name: invoke dhclient
-    ansible.builtin.command: dhclient
-    when: ansible_distribution|lower == "ubuntu" or ansible_distribution|lower == "debian"
   - name: NFS
     ansible.posix.mount:
       path: /mnt/nfs

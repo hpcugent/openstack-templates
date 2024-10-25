@@ -1,3 +1,6 @@
 #cloud-config
 runcmd:
 - [mkdir,-p,/opt/vsc/cron]
+updates:
+  network:
+    when: [hotplug]
