@@ -84,3 +84,8 @@ variable "scripts_enabled" {
   default = true
   description = "Enables or disables local ansible scripts"
 }
+variable "vsc_ip" {
+  type = string
+  default = null
+  description = "override VSC dedicated IP"
+}

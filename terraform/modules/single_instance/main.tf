@@ -108,4 +108,5 @@ module "linux_vsc" {
     user = local.ssh_user
     scripts_enabled = local.scripts_enabled
   }
+  override_ip = var.vsc_ip
 }

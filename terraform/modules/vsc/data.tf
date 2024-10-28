@@ -8,6 +8,7 @@ data "openstack_networking_network_v2" "vsc_internal" {
   name = "vsc"
 }
 resource "shell_script" "vsc_ip_id" {
+  count = var.override_ip == null ? 1 : 0
   environment = {
     OS_CLOUD = var.cloud
   }

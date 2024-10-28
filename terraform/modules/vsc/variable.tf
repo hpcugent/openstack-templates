@@ -24,3 +24,7 @@ variable "host" {
     scripts_enabled = bool
   })
 }
+variable "override_ip" {
+  type = string
+  default = null
+}
