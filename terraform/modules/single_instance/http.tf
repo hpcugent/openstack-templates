@@ -12,13 +12,13 @@ resource "openstack_networking_portforwarding_v2" "http" {
       condition     = var.public
       error_message = ("Cant enable forward on a private instance!")
     }
-    replace_triggered_by = [terraform_data.http_port.output]
+    replace_triggered_by = [terraform_data.http_port]
   }
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http-80"
 }
 resource terraform_data http_port {
   # stupid work around for terraform being unable to cope with optional replaced_triggered_by
-  input = try(shell_script.port_http[0].output,local.ports.http)
+  input = local.ports.http
 }
 resource "openstack_networking_portforwarding_v2" "https" {
   count               = var.nginx_enabled ? 1 : 0
