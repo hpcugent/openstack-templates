@@ -13,6 +13,7 @@ resource "openstack_networking_portforwarding_v2" "http" {
       error_message = ("Cant enable forward on a private instance!")
     }
     replace_triggered_by = [terraform_data.http_port]
+    ignore_changes = [ description ] #because otherwise provider crashes
   }
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http-80"
 }
