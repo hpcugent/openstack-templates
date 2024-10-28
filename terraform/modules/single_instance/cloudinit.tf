@@ -17,7 +17,7 @@ data "cloudinit_config" "main" {
     content = <<-EOF
     #!/bin/bash
     if [[ -r '/etc/debian_version' ]];then 
-      apt-get update && apt-get install -y nfs-common cron
+      apt-get update && apt-get install -y cron
     fi
     EOF
   }

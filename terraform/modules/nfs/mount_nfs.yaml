@@ -1,6 +1,12 @@
 - name: Configure NFS mount
   hosts: all
   tasks:
+  - name: "{{ (mount == 'true') | ternary('Install','Uninstall')}} NFS"
+    package: name=nfs-common state="{{ 'present' if mount == 'true' else 'absent' }}"
+    retries: 5
+    delay: 5
+    timeout: 120
+    when: (ansible_distribution|lower == "ubuntu") or ansible_distribution|lower == "debian"
   - name: NFS
     ansible.posix.mount:
       path: /mnt/nfs

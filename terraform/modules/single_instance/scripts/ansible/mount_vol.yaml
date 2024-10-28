@@ -8,5 +8,5 @@
       fstype: "{{ filesystem }}"
       opts: defaults
       state: "{{ 'mounted' if mount == 'true' else 'absent' }}"
-    become: true
     timeout: 60
+  become: true
