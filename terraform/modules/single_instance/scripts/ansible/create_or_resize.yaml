@@ -1,5 +1,6 @@
 - name: "Resize {{device}}"
-  hosts: all
+  connection: local
+  hosts: localhost
   tasks:
   - name: CreateOrResize
     community.general.filesystem:

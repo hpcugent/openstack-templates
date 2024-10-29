@@ -1,5 +1,6 @@
 - name: "Mount {{vol_name}}"
-  hosts: all
+  connection: local
+  hosts: localhost
   tasks:
   - name: Mount
     ansible.posix.mount:

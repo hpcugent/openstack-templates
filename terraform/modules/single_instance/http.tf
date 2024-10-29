@@ -61,23 +61,26 @@ resource "openstack_networking_secgroup_rule_v2" "https" {
   security_group_id = openstack_networking_secgroup_v2.secgroup.id
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http"
 }
+
 resource "null_resource" "nginx" {
   count = ( var.nginx_enabled && local.scripts_enabled ) ? 1 : 0
   triggers = {
     enabled = var.nginx_enabled
-    scripts_dir = local.scripts_dir
-    ansible_command = local.ansible_command
-    environment = jsonencode(local.ansible_env)
+    user = local.ssh_user
+    port = local.ports.ssh
+    ip = data.openstack_networking_floatingip_v2.public.address
   }
   depends_on = [ null_resource.testconnection ]
-  provisioner "local-exec" {
-    environment = jsondecode(self.triggers.environment)
-    command = "${self.triggers.ansible_command} ${self.triggers.scripts_dir}/ansible/nginx.yaml --extra-vars install=${self.triggers.enabled}"
+  connection {
+    user     = self.triggers.user
+    host     = self.triggers.ip
+    port = self.triggers.port
   }
-  provisioner "local-exec" {
-    environment = jsondecode(self.triggers.environment)
+  provisioner "remote-exec" {
+    inline = [ "sudo ansible-playbook /opt/vsc/ansible/nginx.yaml --extra-vars install=${self.triggers.enabled}" ]
+  }
+  provisioner "remote-exec" {
     when = destroy
-    on_failure = continue
-    command=  "${self.triggers.ansible_command} ${self.triggers.scripts_dir}/ansible/nginx.yaml --extra-vars install=false"
+    inline = [ "sudo ansible-playbook /opt/vsc/ansible/nginx.yaml --extra-vars install=false" ]
   }
 }

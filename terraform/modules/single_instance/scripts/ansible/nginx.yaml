@@ -1,15 +1,18 @@
 - name: Configure Nginx
-  hosts: all
+  connection: local
+  hosts: localhost
   tasks:
    - name: "{{ (install == 'true') | ternary('Install','Uninstall')}} Nginx"
-     package: name=nginx state="{{ 'present' if install == 'true' else 'absent' }}"
+     package: 
+      name: nginx 
+      state: "{{ 'present' if install else 'absent' }}"
      notify:
       - Start Nginx
      retries: 5
      delay: 5
+  timeout: 240
   handlers:
    - name: Start Nginx
-     service: name=nginx state="{{ 'started' if install == 'true' else 'stopped' }}"
+     service: name=nginx state="{{ 'started' if install else 'stopped' }}"
      when: install
-  timeout: 120
   become: true

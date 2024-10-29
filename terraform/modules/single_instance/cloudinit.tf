@@ -4,7 +4,7 @@ data "cloudinit_config" "main" {
   part {
     filename     = "cloud-config.yaml"
     content_type = "text/cloud-config"
-    content = file("${local.scripts_dir}/cloud-config.yaml")
+    content = templatefile("${local.scripts_dir}/cloud-config.yaml", {files = data.local_file.ansible }) 
   }
   part {
     filename     = "userscript.sh"
@@ -29,4 +29,11 @@ data "cloudinit_config" "main" {
       content = part.value.content
     }
   }
+}
+locals {
+  ansible_files = fileset("${local.scripts_dir}/ansible/", "**")
+}
+data "local_file" "ansible" {
+  for_each = local.ansible_files
+  filename = "${local.scripts_dir}/ansible/${each.value}"
 }

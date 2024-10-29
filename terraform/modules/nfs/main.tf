@@ -28,34 +28,27 @@ resource "openstack_sharedfilesystem_share_access_v2" "share_01_access" {
   access_to    = "0.0.0.0"
   access_level = "rw"
 }
+
 resource "null_resource" "nfs" {
   count = var.host.scripts_enabled ? 1 : 0
   triggers = {
-    path = openstack_sharedfilesystem_share_v2.share_01.export_locations[0].path
-    ansible_command = local.ansible_command
-    ansible_env = jsonencode(local.ansible_env)
+    path    = openstack_sharedfilesystem_share_v2.share_01.export_locations[0].path
+    user = var.host.user
+    port = var.host.port
+    ip = var.host.ip
   }
-  depends_on = [ openstack_sharedfilesystem_share_access_v2.share_01_access, openstack_compute_interface_attach_v2.ai_1 ]
-  provisioner "local-exec" {
-    environment = jsondecode(self.triggers.ansible_env)
-    command = <<EOF
-    ${self.triggers.ansible_command} ${path.module}/mount_nfs.yaml -e "mount=true nfs_path=${self.triggers.path}"
-    EOF
+  connection {
+    user     = self.triggers.user
+    host     = self.triggers.ip
+    port = self.triggers.port
+    timeout = "2m"
   }
-  provisioner "local-exec" {
-    environment = jsondecode(self.triggers.ansible_env)
+  provisioner "remote-exec" {
+    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_nfs.yaml -e \"mount=true nfs_path=${self.triggers.path}\"" ]
+  }
+    provisioner "remote-exec" {
     when = destroy
     on_failure = continue
-    command = <<EOF
-    ${self.triggers.ansible_command} ${path.module}/mount_nfs.yaml -e "mount=false nfs_path=${self.triggers.path}"
-    EOF  
+    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_nfs.yaml -e \"mount=false nfs_path=${self.triggers.path}\"" ]
   }
-}
-locals {
-  ansible_env={
-    ANSIBLE_REMOTE_PORT = var.host.port
-    ANSIBLE_REMOTE_USER = var.host.user
-    ANSIBLE_HOST_KEY_CHECKING = false
-  }
-  ansible_command="timeout 2m ansible-playbook -c ssh -i ${var.host.ip},"
 }
