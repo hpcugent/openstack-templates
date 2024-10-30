@@ -75,12 +75,14 @@ resource "null_resource" "nginx" {
     user     = self.triggers.user
     host     = self.triggers.ip
     port = self.triggers.port
+    timeout = "2m"
   }
   provisioner "remote-exec" {
     inline = [ "sudo ansible-playbook /opt/vsc/ansible/nginx.yaml --extra-vars install=${self.triggers.enabled}" ]
   }
   provisioner "remote-exec" {
     when = destroy
+    on_failure = continue
     inline = [ "sudo ansible-playbook /opt/vsc/ansible/nginx.yaml --extra-vars install=false" ]
   }
 }
