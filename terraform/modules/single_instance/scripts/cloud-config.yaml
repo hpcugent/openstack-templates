@@ -20,7 +20,6 @@ write_files:
     inventory_unparsed_warning=False
   path: /etc/ansible/ansible.cfg
 runcmd:
-- [mkdir,-p,/opt/vsc/cron]
 - ["ansible-galaxy", "collection", "install", "ansible.posix"]
 - ["ansible-galaxy", "collection", "install", "community.general"]
 updates:
