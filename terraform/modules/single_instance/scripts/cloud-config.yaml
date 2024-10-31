@@ -2,7 +2,6 @@
 packages:
   - curl
   - jq
-  - ansible-core
 write_files:
 %{ for file in files }
 - encoding: b64
