@@ -92,6 +92,16 @@ module "linux_nfs" {
     testconnection = try(null_resource.testconnection[0].id,"")
   }
 }
+module "nfs_network" {
+  count = var.nfs_network == true && var.nfs_enabled == false ? 1 : 0
+  source = "../nfs_network"
+  security_group_ids = ["${openstack_networking_secgroup_v2.secgroup.id}"]
+  instance_id        = openstack_compute_instance_v2.instance_01.id
+  cloud              = local.cloud
+  vm_name            = var.vm_name
+  user_name          = data.openstack_identity_auth_scope_v3.scope.user_name
+  project_name = local.project_name
+}
 module "linux_vsc" {
   count             = var.vsc_enabled ? 1 : 0
   source            = "../vsc"

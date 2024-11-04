@@ -89,3 +89,8 @@ variable "vsc_ip" {
   default = null
   description = "override VSC dedicated IP"
 }
+variable "nfs_network" {
+  type = bool
+  default = false
+  description = "Enable the NFS network"
+}
