@@ -1,5 +1,5 @@
 resource "openstack_networking_floatingip_associate_v2" "vsc" {
-  floating_ip = coalesce(var.override_ip,shell_script.vsc_ip_id[0].output["Floating IP Address"])
+  floating_ip = coalesce(var.override_ip,try(shell_script.vsc_ip_id[0].output["Floating IP Address"],null))
   port_id     = openstack_networking_port_v2.vsc.id
 }
 resource "openstack_networking_port_v2" "vsc" {
