@@ -37,7 +37,7 @@ module "MyPrivateVM" { # A private VM for running a backend service
     prometheus = {
       port = 9090
       protocol = "tcp"
-      remote_ip_prefix = "${module.MyPublicVM.VM_private_ip}/32" #Only allow from the public instance
+      remote_ip_prefix = "${module.MyPublicVM.VM_private_ip}/24" #Only allow from the public instance
     }
   }
 }
