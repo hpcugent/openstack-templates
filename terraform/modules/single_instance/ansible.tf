@@ -21,9 +21,9 @@ resource "null_resource" "testconnection" {
       port = self.triggers.port
       timeout = "5m"
     }
-    inline = [ "until [ \"$(cloud-init status)\" = 'status: done' ] ;do sleep 5;done" ]
+    script = "${local.scripts_dir}/test_connection.sh"
   }
 }
 locals {
-  scripts_enabled = var.is_windows ? false : var.scripts_enabled
+  scripts_enabled = var.is_windows || !var.public ? false : var.scripts_enabled
 }
