@@ -1,0 +1,54 @@
+module "MyPublicVM" { # A public VM for running a frontend service
+  source        = "../modules/single_instance"
+  vm_name       = "MyPublicVM"
+  image_name    = "Ubuntu-24.04"
+  flavor_name   = "CPUv1.medium"
+  is_windows = false
+  nfs_network = true #Attach to the nfs network so we can mount the share created below
+  userscript = <<-EOF
+  #!/bin/bash
+  snap install grafana
+  EOF
+  custom_secgroup_rules = {
+    prometheus = {
+      port = 3000
+      protocol = "tcp"
+      remote_ip_prefix = "0.0.0.0/0"
+      expose = true #Expose directly to the internet
+    }
+  }
+}
+output "MyPublicVM" {
+  value = module.MyPublicVM.Connections #Output the public ip
+}
+module "MyPrivateVM" { # A private VM for running a backend service
+  source        = "../modules/single_instance"
+  vm_name       = "MyPrivateVM"
+  image_name    = "Ubuntu-24.04"
+  flavor_name   = "CPUv1.medium"
+  is_windows = false
+  nfs_network = true #Attach to the nfs network so we can mount the share created below
+  public = false
+  userscript = <<-EOF
+  #!/bin/bash
+  apt install -y prometheus prometheus-node-exporter
+  EOF
+  custom_secgroup_rules = {
+    prometheus = {
+      port = 9090
+      protocol = "tcp"
+      remote_ip_prefix = "${module.MyPublicVM.VM_private_ip}/32" #Only allow from the public instance
+    }
+  }
+}
+output "MyPrivateVM" {
+  value = module.MyPrivateVM.Connections #output the private ip of the backend
+}
+module "nfs-share" { #Volume to store common data on
+  source = "../modules/nfs_share"
+  name = "MyShare"
+  size = 30
+}
+output "nfs-share" {
+  value = module.nfs-share.path #Output the nfs path
+}
