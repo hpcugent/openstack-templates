@@ -28,27 +28,3 @@ resource "openstack_sharedfilesystem_share_access_v2" "share_01_access" {
   access_to    = "0.0.0.0"
   access_level = "rw"
 }
-
-resource "null_resource" "nfs" {
-  count = var.host.scripts_enabled ? 1 : 0
-  triggers = {
-    path    = openstack_sharedfilesystem_share_v2.share_01.export_locations[0].path
-    user = var.host.user
-    port = var.host.port
-    ip = var.host.ip
-  }
-  connection {
-    user     = self.triggers.user
-    host     = self.triggers.ip
-    port = self.triggers.port
-    timeout = "2m"
-  }
-  provisioner "remote-exec" {
-    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_nfs.yaml -e \"mount=true nfs_path=${self.triggers.path}\"" ]
-  }
-    provisioner "remote-exec" {
-    when = destroy
-    on_failure = continue
-    inline = [ "sudo ansible-playbook /opt/vsc/ansible/mount_nfs.yaml -e \"mount=false nfs_path=${self.triggers.path}\"" ]
-  }
-}
