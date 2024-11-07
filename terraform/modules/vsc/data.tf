@@ -14,7 +14,7 @@ resource "shell_script" "vsc_ip_id" {
   }
   lifecycle_commands {
     create = <<EOF
-    openstack floating ip list --network ${data.openstack_networking_network_v2.vsc_internal.id} -f json | jq '.[] | select(.Port==null)'
+    openstack floating ip list --network ${data.openstack_networking_network_v2.vsc_internal.id} -f json | jq '.[] | select((.Port=="${openstack_networking_port_v2.vsc.id}") or (.Port==null))'
     EOF
     delete = ""
   }
