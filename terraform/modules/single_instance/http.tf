@@ -10,7 +10,7 @@ resource "openstack_networking_portforwarding_v2" "http" {
   lifecycle {
     precondition {
       condition     = var.public
-      error_message = ("Cant enable forward on a private instance!")
+      error_message = ("Can't enable forward on a private instance!")
     }
     replace_triggered_by = [terraform_data.http_port]
     ignore_changes = [ description ] #because otherwise provider crashes
