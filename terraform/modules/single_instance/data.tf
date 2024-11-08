@@ -77,6 +77,12 @@ resource "shell_script" "port_https" {
   }
   working_directory = path.root
   interpreter       = ["/bin/bash", "-c"]
+  lifecycle {
+    postcondition {
+      condition = jsondecode(self.output["ports"])[0] != jsondecode(shell_script.port_http[0].output["ports"])[0]
+      error_message = "Terraform generated duplicate port, please run apply again!"
+    }
+  }
 }
 data "openstack_identity_auth_scope_v3" "scope" {
   name = "scope"
