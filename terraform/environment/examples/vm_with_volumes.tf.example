@@ -1,6 +1,6 @@
-module "MyVM" {
+module "MyVMVolumeExample" {
   source        = "../modules/single_instance"
-  vm_name       = "MyVM"
+  vm_name       = "MyVMVolumeExample"
   image_name    = "Rocky-9"
   flavor_name   = "CPUv1.medium"
   nginx_enabled = false #Installs nginx and exposes ports 80 and 443
@@ -16,6 +16,6 @@ module "MyVM" {
     }
   }
 }
-output "MyVM" {
-  value = module.MyVM.Connections
+output "MyVMVolumeExample" {
+  value = module.MyVMVolumeExample.Connections
 }

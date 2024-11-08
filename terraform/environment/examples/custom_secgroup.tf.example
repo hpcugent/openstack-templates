@@ -1,6 +1,6 @@
-module "MyVMWithPorts" {
+module "MyVMWithPortsExample" {
   source        = "../modules/single_instance"
-  vm_name       = "MyVM"
+  vm_name       = "MyVMWithPortsExample"
   image_name    = "Rocky-9"
   flavor_name   = "CPUv1.medium"
   custom_secgroup_rules = { 
@@ -13,6 +13,6 @@ module "MyVMWithPorts" {
   }
   is_windows=false
 }
-output "MyVMWithPorts" {
-  value = module.MyVMWithPorts.Connections
+output "MyVMWithPortsExample" {
+  value = module.MyVMWithPortsExample.Connections
 }

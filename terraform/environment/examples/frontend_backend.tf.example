@@ -1,6 +1,6 @@
-module "MyPublicVM" { # A public VM for running a frontend service
+module "MyPublicVMExample" { # A public VM for running a frontend service
   source        = "../modules/single_instance"
-  vm_name       = "MyPublicVM"
+  vm_name       = "MyPublicVMExample"
   image_name    = "Ubuntu-24.04"
   flavor_name   = "CPUv1.medium"
   is_windows = false
@@ -18,12 +18,12 @@ module "MyPublicVM" { # A public VM for running a frontend service
     }
   }
 }
-output "MyPublicVM" {
-  value = module.MyPublicVM.Connections #Output the public ip
+output "MyPublicVMExample" {
+  value = module.MyPublicVMExample.Connections #Output the public ip
 }
-module "MyPrivateVM" { # A private VM for running a backend service
+module "MyPrivateVMExample" { # A private VM for running a backend service
   source        = "../modules/single_instance"
-  vm_name       = "MyPrivateVM"
+  vm_name       = "MyPrivateVMExample"
   image_name    = "Ubuntu-24.04"
   flavor_name   = "CPUv1.medium"
   is_windows = false
@@ -41,14 +41,6 @@ module "MyPrivateVM" { # A private VM for running a backend service
     }
   }
 }
-output "MyPrivateVM" {
-  value = module.MyPrivateVM.Connections #output the private ip of the backend
-}
-module "nfs-share" { #Volume to store common data on
-  source = "../modules/nfs_share"
-  name = "MyShare"
-  size = 30
-}
-output "nfs-share" {
-  value = module.nfs-share.path #Output the nfs path
+output "MyPrivateVMExample" {
+  value = module.MyPrivateVMExample.Connections #output the private ip of the backend
 }
