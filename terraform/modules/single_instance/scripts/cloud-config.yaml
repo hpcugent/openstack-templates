@@ -1,0 +1,26 @@
+#cloud-config
+packages:
+  - curl
+  - jq
+write_files:
+%{ for file in files }
+- encoding: b64
+  content: ${ file.content_base64 }
+  owner: root:root
+  path: /opt/vsc/ansible/${basename(file.filename)}
+  permissions: '0770'
+%{ endfor }
+- content: |
+    [defaults]
+    localhost_warning=False
+    collections_on_ansible_version_mismatch=ignore
+
+    [inventory]
+    inventory_unparsed_warning=False
+  path: /etc/ansible/ansible.cfg
+runcmd:
+- ["ansible-galaxy", "collection", "install", "ansible.posix"]
+- ["ansible-galaxy", "collection", "install", "community.general"]
+updates:
+  network:
+    when: [hotplug]

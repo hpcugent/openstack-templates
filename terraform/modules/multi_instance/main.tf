@@ -7,8 +7,9 @@ module "main" {
   project_name  = var.project_name
   access_key    = var.access_key
   vsc_enabled   = var.public_vsc_enabled
-  playbook_url  = var.playbook_url
+  userscript = var.userscript
   is_windows    = false
+  custom_secgroup_rules = var.public_secgroup_rules
 }
 module "private" {
   count        = var.private_count

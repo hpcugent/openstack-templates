@@ -1,0 +1,46 @@
+module "MyPublicVMExample" { # A public VM for running a frontend service
+  source        = "../modules/single_instance"
+  vm_name       = "MyPublicVMExample"
+  image_name    = "Ubuntu-24.04"
+  flavor_name   = "CPUv1.medium"
+  is_windows = false
+  nfs_network = true #Attach to the nfs network so we can mount the share created below
+  userscript = <<-EOF
+  #!/bin/bash
+  snap install grafana
+  EOF
+  custom_secgroup_rules = {
+    prometheus = {
+      port = 3000
+      protocol = "tcp"
+      remote_ip_prefix = "0.0.0.0/0"
+      expose = true #Expose directly to the internet
+    }
+  }
+}
+output "MyPublicVMExample" {
+  value = module.MyPublicVMExample.Connections #Output the public ip
+}
+module "MyPrivateVMExample" { # A private VM for running a backend service
+  source        = "../modules/single_instance"
+  vm_name       = "MyPrivateVMExample"
+  image_name    = "Ubuntu-24.04"
+  flavor_name   = "CPUv1.medium"
+  is_windows = false
+  nfs_network = true #Attach to the nfs network so we can mount the share created below
+  public = false
+  userscript = <<-EOF
+  #!/bin/bash
+  apt install -y prometheus prometheus-node-exporter
+  EOF
+  custom_secgroup_rules = {
+    prometheus = {
+      port = 9090
+      protocol = "tcp"
+      remote_ip_prefix = "${module.MyPublicVM.VM_private_ip}/24" #Only allow from the public instance
+    }
+  }
+}
+output "MyPrivateVMExample" {
+  value = module.MyPrivateVMExample.Connections #output the private ip of the backend
+}

@@ -12,7 +12,7 @@ resource "openstack_compute_instance_v2" "instance_01" {
   name        = var.vm_name
   flavor_name = var.flavor_name
   key_pair    = local.access_key
-  user_data   = file("../scripts/userdata.sh")
+  user_data   = data.cloudinit_config.main.rendered
   block_device {
     uuid                  = openstack_blockstorage_volume_v3.root.id
     source_type           = "volume"
@@ -21,14 +21,16 @@ resource "openstack_compute_instance_v2" "instance_01" {
     delete_on_termination = true
   }
   metadata = {
-    _SHARE_       = var.nfs_enabled ? module.linux_nfs[0].nfs_path : ""
-    _ANSIBLE_URL_ = var.nginx_enabled ? var.playbook_url : ""
     admin_pass    = var.is_windows ? random_string.winpass[0].result : "N/A"
   }
   network {
     port = openstack_networking_port_v2.vm.id
   }
   tags = [ data.openstack_identity_auth_scope_v3.scope.user_name, var.vm_name ]
+  lifecycle {
+    # Otherwise a script update to userdata will trigger a recreate
+    ignore_changes = [ user_data ]
+  }
 }
 
 resource "openstack_networking_secgroup_v2" "secgroup" {
@@ -82,6 +84,23 @@ module "linux_nfs" {
   cloud              = local.cloud
   vm_name            = var.vm_name
   user_name          = data.openstack_identity_auth_scope_v3.scope.user_name
+  host = {
+    ip = data.openstack_networking_floatingip_v2.public.address
+    port = local.ports.ssh
+    user = local.ssh_user
+    scripts_enabled = local.scripts_enabled
+    testconnection = try(null_resource.testconnection[0].id,"")
+  }
+}
+module "nfs_network" {
+  count = var.nfs_network == true && var.nfs_enabled == false ? 1 : 0
+  source = "../nfs_network"
+  security_group_ids = ["${openstack_networking_secgroup_v2.secgroup.id}"]
+  instance_id        = openstack_compute_instance_v2.instance_01.id
+  cloud              = local.cloud
+  vm_name            = var.vm_name
+  user_name          = data.openstack_identity_auth_scope_v3.scope.user_name
+  project_name = local.project_name
 }
 module "linux_vsc" {
   count             = var.vsc_enabled ? 1 : 0
@@ -92,4 +111,12 @@ module "linux_vsc" {
   cloud             = local.cloud
   vm_name           = var.vm_name
   user_name         = data.openstack_identity_auth_scope_v3.scope.user_name
+  host = {
+    ip = data.openstack_networking_floatingip_v2.public.address
+    port = local.ports.ssh
+    user = local.ssh_user
+    scripts_enabled = local.scripts_enabled
+    testconnection = try(null_resource.testconnection[0].id,"")
+  }
+  override_ip = var.vsc_ip
 }
