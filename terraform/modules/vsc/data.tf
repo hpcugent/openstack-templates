@@ -7,11 +7,15 @@ data "openstack_networking_subnet_ids_v2" "vsc" {
 data "openstack_networking_network_v2" "vsc_internal" {
   name = "vsc"
 }
-data "shell_script" "vsc_ip_id" {
+resource "shell_script" "vsc_ip_id" {
+  count = var.override_ip == null ? 1 : 0
   environment = {
     OS_CLOUD = var.cloud
   }
   lifecycle_commands {
-    read = "openstack floating ip list --network ${data.openstack_networking_network_v2.vsc_internal.id} -f json | jq '[.[] | select(.Port==null)][0]'"
+    create = <<EOF
+    openstack floating ip list --network ${data.openstack_networking_network_v2.vsc_internal.id} -f json | jq '.[] | select((.Port=="${openstack_networking_port_v2.vsc.id}") or (.Port==null))'
+    EOF
+    delete = ""
   }
 }

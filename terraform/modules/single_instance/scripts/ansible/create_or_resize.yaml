@@ -1,0 +1,11 @@
+- name: "Resize {{device}}"
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: CreateOrResize
+    community.general.filesystem:
+      fstype: "{{ filesystem }}"
+      dev: "{{ device }}"
+      resizefs: true
+    become: true
+    timeout: 60

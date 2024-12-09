@@ -1,0 +1,18 @@
+module "MyVMWithPortsExample" {
+  source        = "../modules/single_instance"
+  vm_name       = "MyVMWithPortsExample"
+  image_name    = "Rocky-9"
+  flavor_name   = "CPUv1.medium"
+  custom_secgroup_rules = { 
+    prometheus = {
+      port = 9090
+      protocol = "tcp"
+      remote_ip_prefix = "0.0.0.0/0"
+      expose   = false # If set to true, will expose this port to the internet through a random external port. Use with caution. 
+    }
+  }
+  is_windows=false
+}
+output "MyVMWithPortsExample" {
+  value = module.MyVMWithPortsExample.Connections
+}
