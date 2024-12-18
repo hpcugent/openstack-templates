@@ -1,0 +1,12 @@
+---
+- name: Install and run Nginx
+  connection: local
+  hosts: localhost
+  tasks:
+   - name: Install Nginx
+     package: name=nginx state=present
+     notify:
+      - Start Nginx
+  handlers:
+   - name: Start Nginx
+     service: name=nginx state=started
