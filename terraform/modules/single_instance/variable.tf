@@ -1,12 +1,14 @@
 variable "vm_name" {
+  type    = string
 }
 variable "image_name" {
-
+  type    = string
 }
 variable "access_key" {
   default = "default"
 }
 variable "flavor_name" {
+  type    = string
 }
 variable "nfs_enabled" {
   default = false
@@ -22,6 +24,8 @@ variable "vsc_enabled" {
 }
 variable "project_name" {
   default = "default"
+}
+variable "floatingip_address" {
 }
 variable "nfs_size" {
   default = 10
@@ -56,6 +60,10 @@ variable "rootdisk_size" {
   default = "default"
 }
 variable "is_windows" {
+  type = bool
+}
+
+variable "persistent_root" {
   type = bool
 }
 variable "userscript"{

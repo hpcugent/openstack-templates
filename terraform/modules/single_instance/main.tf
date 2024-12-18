@@ -18,7 +18,7 @@ resource "openstack_compute_instance_v2" "instance_01" {
     source_type           = "volume"
     boot_index            = 0
     destination_type      = "volume"
-    delete_on_termination = true
+    delete_on_termination = !var.persistent_root
   }
   metadata = {
     admin_pass    = var.is_windows ? random_string.winpass[0].result : "N/A"
