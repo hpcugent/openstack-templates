@@ -1,0 +1,34 @@
+##
+#
+# This example includes a public VM with a public IP address and a number (3) of private VMs that have no public IP address.
+# Be aware that you need to use the public VM as a Jumphost to reach the private VMs. Extra customization scripts are disabled for private VMs.
+#
+##
+module "PublicVM" {
+  source        = "../modules/single_instance"
+  vm_name       = "PublicVMExample"
+  image_name    = "Rocky-9"
+  flavor_name   = "CPUv1.medium" # Jumphost doesnt require many resources
+  nginx_enabled = false #Installs nginx and exposes ports 80 and 443
+  nfs_network   = false #Only set true if you requested access
+  vsc_enabled   = false #Only set true if you requested access
+  is_windows = false
+}
+output "MyVMExample" {
+  value = module.PublicVM.Connections
+}
+
+module "PrivateVMs" {
+  count = 3 # Modify as necessary
+  source        = "../modules/single_instance"
+  vm_name       = "PrivateVMExample${count.index}"
+  image_name    = "Rocky-9"
+  flavor_name   = "CPUv1.medium"
+  nfs_network   = false #Only set true if you requested access
+  vsc_enabled   = false #Only set true if you requested access
+  is_windows = false
+  public = false # Do not add a public IP
+}
+output "PrivateVMs" {
+  value = module.PrivateVMs[*].Connections
+}
