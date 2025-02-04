@@ -26,6 +26,7 @@ variable "project_name" {
   default = "default"
 }
 variable "floatingip_address" {
+  default = null
 }
 variable "nfs_size" {
   default = 10
@@ -65,6 +66,7 @@ variable "is_windows" {
 
 variable "persistent_root" {
   type = bool
+  default = false
 }
 variable "userscript"{
   type = string
