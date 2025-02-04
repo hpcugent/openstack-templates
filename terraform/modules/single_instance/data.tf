@@ -116,7 +116,8 @@ data "openstack_networking_network_v2" "public" {
   name = "public"
 }
 data "openstack_networking_floatingip_v2" "public" {
-  pool = data.openstack_networking_network_v2.public.id
+  pool = var.floatingip_address == null ? data.openstack_networking_network_v2.public.id : null
+  address = var.floatingip_address # Null by default
 }
 resource "random_string" "winpass" {
   count   = var.is_windows ? 1 : 0
