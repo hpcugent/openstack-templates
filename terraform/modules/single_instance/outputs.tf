@@ -40,7 +40,7 @@ locals {
     "Ubuntu-22.04"    = "ubuntu"
     "Ubuntu-24.04"    = "ubuntu"
   }
-  ssh_user           = contains(keys(local.ssh_users), var.image_name) ? local.ssh_users[var.image_name] : "root"
+  ssh_user           = var.ssh_user == null ? (contains(keys(local.ssh_users), var.image_name) ? local.ssh_users[var.image_name] : "root") : var.ssh_user
   private_ssh_string = "SSH: ssh -A ${local.ssh_user}@${openstack_compute_instance_v2.instance_01.network[0].fixed_ip_v4}"
   ssh_string         = var.public ? "SSH: ssh -A -p ${local.ports.ssh} ${local.ssh_user}@${data.openstack_networking_floatingip_v2.public.address}" : local.private_ssh_string
   windows_string     = var.is_windows ? "xfreerdp /dynamic-resolution /u:admin /port:${local.ports.ssh} /v:${data.openstack_networking_floatingip_v2.public.address} /p:${random_string.winpass[0].result}" : ""
