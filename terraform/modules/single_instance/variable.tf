@@ -104,3 +104,8 @@ variable "nfs_network" {
   default = false
   description = "Enable the NFS network"
 }
+variable "ssh_user" {
+  type = string
+  default = null
+  description = "Default ssh user for the image."
+}
