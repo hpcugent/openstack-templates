@@ -41,6 +41,7 @@ variable "volumes" {
     size = number
     automount = optional(bool, false)
     filesystem  = optional(string, "ext4")
+    fastpool = optional(bool,false)
   }))
   default = {}
   validation {
@@ -65,6 +66,10 @@ variable "is_windows" {
 }
 
 variable "persistent_root" {
+  type = bool
+  default = false
+}
+variable "rootvolume_fastpool" {
   type = bool
   default = false
 }

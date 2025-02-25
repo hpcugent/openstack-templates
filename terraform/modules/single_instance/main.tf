@@ -6,6 +6,7 @@ resource "openstack_blockstorage_volume_v3" "root" {
   lifecycle {
     ignore_changes = [ image_id, source_vol_id]
   }
+  volume_type = var.rootvolume_fastpool ? "fastpool" : "tripleo"
 }
 
 resource "openstack_compute_instance_v2" "instance_01" {
