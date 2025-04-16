@@ -35,7 +35,7 @@ resource "shell_script" "custom_portforward" {
 }
 resource "openstack_networking_portforwarding_v2" "custom" {
   for_each =  {
-    for k, v in var.custom_secgroup_rules:  k => merge(v,{external_port = jsondecode(shell_script.custom_portforward[k].output["ports"])[0] })
+    for k, v in var.custom_secgroup_rules:  k => merge(v,{external_port = v.external_port != null ? v.external_port : jsondecode(shell_script.custom_portforward[k].output["ports"])[0] })
     if var.custom_secgroup_rules[k].expose == true
   }
   floatingip_id       = data.openstack_networking_floatingip_v2.public.id
