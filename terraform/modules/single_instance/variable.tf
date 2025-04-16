@@ -1,3 +1,10 @@
+locals {
+  ugent_port_range = {
+    min = 51001
+    max = 59999
+  }
+}
+
 variable "vm_name" {
   type    = string
 }
@@ -55,8 +62,20 @@ variable "custom_secgroup_rules" {
     remote_ip_prefix = string
     protocol = string
     expose = optional(bool,false)
+    external_port = optional(number,null)
   }))
   default = {}
+  validation {
+    condition = (
+      anytrue(
+        [for v in var.custom_secgroup_rules :
+          v.external_port == null ? true : (v.external_port >= local.ugent_port_range.min &&
+          v.external_port <= local.ugent_port_range.max)
+      ])
+
+    )
+    error_message = "External port must be between ${local.ugent_port_range.min} and ${local.ugent_port_range.max}"
+  }
 }
 variable "rootdisk_size" {
   default = "default"
