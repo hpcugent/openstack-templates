@@ -24,6 +24,12 @@ variable "nfs_enabled" {
 variable "nginx_enabled" {
   default = false
   type    = bool
+  description = "Expose ports 80 and 443, *and* install a webserver."
+}
+variable "expose_web" {
+  default = false
+  type = bool
+  description = "Expose ports 80 and 443, but don't install a webserver."
 }
 variable "vsc_enabled" {
   default = false
