@@ -1,5 +1,5 @@
 resource "openstack_networking_portforwarding_v2" "http" {
-  count               = var.nginx_enabled ? 1 : 0
+  count               = (var.nginx_enabled || var.expose_web) ? 1 : 0
   floatingip_id       = data.openstack_networking_floatingip_v2.public.id
   external_port       = local.ports.http
   internal_port       = 80
@@ -22,7 +22,7 @@ resource terraform_data http_port {
   input = local.ports.http
 }
 resource "openstack_networking_portforwarding_v2" "https" {
-  count               = var.nginx_enabled ? 1 : 0
+  count               = (var.nginx_enabled || var.expose_web) ? 1 : 0
   floatingip_id       = data.openstack_networking_floatingip_v2.public.id
   external_port       = local.ports.https
   internal_port       = 443
@@ -40,7 +40,7 @@ resource "openstack_networking_portforwarding_v2" "https" {
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http-443"
 }
 resource "openstack_networking_secgroup_rule_v2" "http" {
-  count             = var.nginx_enabled ? 1 : 0
+  count             = (var.nginx_enabled || var.expose_web) ? 1 : 0
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"
@@ -51,7 +51,7 @@ resource "openstack_networking_secgroup_rule_v2" "http" {
   description = "${data.openstack_identity_auth_scope_v3.scope.user_name}-${var.vm_name}-http"
 }
 resource "openstack_networking_secgroup_rule_v2" "https" {
-  count             = var.nginx_enabled ? 1 : 0
+  count             = (var.nginx_enabled || var.expose_web) ? 1 : 0
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = "tcp"

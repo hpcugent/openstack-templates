@@ -24,6 +24,12 @@ variable "nfs_enabled" {
 variable "nginx_enabled" {
   default = false
   type    = bool
+  description = "Expose ports 80 and 443, *and* install a webserver."
+}
+variable "expose_web" {
+  default = false
+  type = bool
+  description = "Expose ports 80 and 443, but don't install a webserver."
 }
 variable "vsc_enabled" {
   default = false
@@ -69,7 +75,7 @@ variable "custom_secgroup_rules" {
     condition = (
       length(var.custom_secgroup_rules) == 0 ? true : anytrue(
         [for v in var.custom_secgroup_rules :
-          v.external_port == null ? true : (v.external_port >= local.ugent_port_range.min &&
+          v.external_port == null ? true : ((v.external_port != "80" || v.external_port != "443") || v.external_port >= local.ugent_port_range.min &&
           v.external_port <= local.ugent_port_range.max)
       ])
 
