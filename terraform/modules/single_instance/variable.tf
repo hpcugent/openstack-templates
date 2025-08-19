@@ -75,7 +75,7 @@ variable "custom_secgroup_rules" {
     condition = (
       length(var.custom_secgroup_rules) == 0 ? true : anytrue(
         [for v in var.custom_secgroup_rules :
-          v.external_port == null ? true : (v.external_port >= local.ugent_port_range.min &&
+          v.external_port == null ? true : ((v.external_port != "80" || v.external_port != "443") || v.external_port >= local.ugent_port_range.min &&
           v.external_port <= local.ugent_port_range.max)
       ])
 
