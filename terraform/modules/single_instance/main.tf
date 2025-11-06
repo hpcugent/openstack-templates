@@ -7,6 +7,9 @@ resource "openstack_blockstorage_volume_v3" "root" {
     ignore_changes = [ image_id, source_vol_id]
   }
   volume_type = var.rootvolume_fastpool ? "fastpool" : "tripleo"
+  timeouts {
+    create = var.is_windows ? "20m" : "10m"
+  }
 }
 
 resource "openstack_compute_instance_v2" "instance_01" {
