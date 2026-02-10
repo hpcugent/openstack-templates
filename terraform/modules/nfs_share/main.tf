@@ -9,7 +9,7 @@ resource "openstack_sharedfilesystem_share_access_v2" "default" {
   count = length(var.access_rules) == 0 ? 1 : 0
   share_id     = openstack_sharedfilesystem_share_v2.share.id
   access_type  = "ip"
-  access_to    = data.openstack_networking_subnet_v2.nfs.cidr
+  access_to    = data.openstack_networking_router_v2.nfs.external_fixed_ip[0].ip_address
   access_level = "rw"
 }
 resource "openstack_sharedfilesystem_share_access_v2" "rules" {

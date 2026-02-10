@@ -14,3 +14,6 @@ data "openstack_networking_subnet_v2" "nfs" {
   name = "${data.openstack_identity_project_v3.project.name}_nfs_vxlan_pool"
 }
 
+data "openstack_networking_router_v2" "nfs" {
+  name = "NAT_nfs_vxlan_${data.openstack_identity_project_v3.project.name}"
+}
