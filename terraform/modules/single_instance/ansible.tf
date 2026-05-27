@@ -8,7 +8,7 @@ locals {
 }
 resource "null_resource" "testconnection" {
   count = local.scripts_enabled ? 1 : 0
-  depends_on = [ openstack_compute_instance_v2.instance_01 ]
+  depends_on = [ openstack_compute_instance_v2.instance_01, openstack_networking_portforwarding_v2.ssh ]
   triggers = {
     user = local.ssh_user
     port = local.ports.ssh
