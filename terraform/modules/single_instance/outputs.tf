@@ -33,6 +33,7 @@ locals {
   ssh_users = {
     "AlmaLinux-8"     = "almalinux"
     "Rocky-9"         = "rocky"
+    "Rocky-10"        = "rocky"
     "CentOS-8-stream" = "centos"
     "Debian-11"       = "debian"
     "Debian-12"       = "debian"
@@ -40,6 +41,7 @@ locals {
     "Ubuntu-20.04"    = "ubuntu"
     "Ubuntu-22.04"    = "ubuntu"
     "Ubuntu-24.04"    = "ubuntu"
+    "Ubuntu-26.04"    = "ubuntu"
   }
   ssh_user           = var.ssh_user == null ? (contains(keys(local.ssh_users), var.image_name) ? local.ssh_users[var.image_name] : "root") : var.ssh_user
   private_ssh_string = "SSH: ssh -A ${local.ssh_user}@${openstack_compute_instance_v2.instance_01.network[0].fixed_ip_v4}"
