@@ -33,6 +33,7 @@ locals {
   ssh_users = {
     "AlmaLinux-8"     = "almalinux"
     "Rocky-9"         = "rocky"
+    "Rocky-10"        = "rocky"
     "CentOS-8-stream" = "centos"
     "Debian-11"       = "debian"
     "Debian-12"       = "debian"
